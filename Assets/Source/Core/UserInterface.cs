@@ -1,5 +1,6 @@
 ﻿using TMPro;
 using UnityEngine;
+using static Assets.Source.Core.UserInterface;
 
 namespace Assets.Source.Core
 {
@@ -48,7 +49,8 @@ namespace Assets.Source.Core
         /// <param name="textPosition"></param>
         public void SetText(string text, TextPosition textPosition)
         {
-            _textComponents[(int) textPosition].text = text;
+            _textComponents[(int)textPosition].text = text;
         }
+
     }
 }
