@@ -54,6 +54,12 @@ namespace DungeonCrawl.Core
             return _allActors.FirstOrDefault(actor => actor.Detectable && actor is T && actor.Position == position) as T;
         }
 
+
+        public T GetActor<T>() where T : Actor
+        {
+            return _allActors.FirstOrDefault(actor => actor.Detectable && actor is T) as T;
+        }
+
         /// <summary>
         ///     Unregisters given actor (use when killing/destroying)
         /// </summary>
