@@ -112,9 +112,7 @@ namespace DungeonCrawl.Actors
 
                         Position = (50, -9);
                         UserInterface.Singleton.SetText("WOW!!", UserInterface.TextPosition.TopCenter);
-
-
-
+                        
                         foreach (var wall in Resources.FindObjectsOfTypeAll<GameObject>())
                         {
                             var wall2 = wall.GetComponent<Renderer>();
@@ -130,13 +128,11 @@ namespace DungeonCrawl.Actors
                         Position = (12, -13);
                         UserInterface.Singleton.SetText("", UserInterface.TextPosition.TopCenter);
                         player.InsideSecretArea = false;
-
-
-
+                        
                         foreach (var wall in Resources.FindObjectsOfTypeAll<GameObject>().Where(obj => !obj.name.Contains("Hiden")))
                         {
                             var wall2 = wall.GetComponent<Renderer>();
-                            if (wall2 != null && wall.name != this.name)
+                            if (wall2 != null && wall.name != this.name && wall.name != player.companion.name)
                             {
                                 Color color = wall2.material.color;
                                 color.a = (float)0.5;

@@ -38,7 +38,7 @@ namespace DungeonCrawl.Actors.Characters
 
         public void ShowStats()
         {
-            UserInterface.Singleton._playerStatsText.text = $"{ActualHealth}/{MaxHealth} \n{(companion is DogCompanion ? (Damage * 2) : Damage)} \n{ActualArmor}  /{MaxArmor} \n{DodgeChance}% \n{Crit}%";
+            UserInterface.Singleton._playerStatsText.text = $"{ActualHealth}/{MaxHealth} \n{(companion is DogCompanion ? (Damage * 2) : Damage)} \n{ActualArmor}/{MaxArmor} \n{DodgeChance}% \n{Crit}%";
         }
 
         protected override void OnUpdate(float deltaTime)
@@ -142,7 +142,6 @@ namespace DungeonCrawl.Actors.Characters
         public void SecretSwitch()
         {
             SecretShowed = !SecretShowed;
-            Debug.Log("in");
             foreach (var wall in Resources.FindObjectsOfTypeAll<GameObject>().Where(obj => obj.name.Contains("Hiden")))
             {
                 var wall2 = wall.GetComponent<Renderer>();
@@ -154,7 +153,8 @@ namespace DungeonCrawl.Actors.Characters
             foreach (var wall in Resources.FindObjectsOfTypeAll<GameObject>().Where(obj => !obj.name.Contains("Hiden")))
             {
                 var wall2 = wall.GetComponent<Renderer>();
-                if (wall2 != null && wall.name != this.name)
+
+                if (wall2 != null && wall.name != this.name && wall.name != this.companion.name)
                 {
                     Color color = wall2.material.color;
                     color.a = SecretShowed ? (float)0.5 : 1;
