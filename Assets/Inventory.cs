@@ -183,6 +183,7 @@ namespace DungeonCrawl.Core
                 Remove(name);
                 player.Map = true;
             }
+            
 
             if (name == "Armor")
             {
@@ -193,6 +194,15 @@ namespace DungeonCrawl.Core
                 GameObject.Find("Armor Holder").GetComponent<Image>().color = new Color32(255, 255, 255, 255);
                 player.ShowStats();
                 player.SetSprite(29);
+            }
+
+            if (name == "Ring1")
+            {
+                player.Crit = 20;
+                Remove(name);
+                GameObject.Find("Ring Holder").GetComponent<Image>().sprite = ActorManager.Singleton.GetSprite(item.SpriteId);
+                GameObject.Find("Ring Holder").GetComponent<Image>().color = new Color32(255, 255, 255, 255);
+                player.ShowStats();
             }
 
         }

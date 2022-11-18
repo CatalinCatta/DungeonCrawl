@@ -3,6 +3,7 @@ using Assets.Source.Core;
 using DungeonCrawl.Core;
 using DungeonCrawl.Actors.Static;
 using System.Linq;
+using System;
 
 namespace DungeonCrawl.Actors.Characters
 {
@@ -17,6 +18,7 @@ namespace DungeonCrawl.Actors.Characters
         public Actor companion;
         public bool Map = false;
         public bool Boss1Killed = false;
+        public int Crit = 0;
 
         public override void Starter()
         {
@@ -34,7 +36,7 @@ namespace DungeonCrawl.Actors.Characters
 
         public void ShowStats()
         {
-            UserInterface.Singleton.SetText("HP: " + ActualHealth + " / " + MaxHealth + "\nDMG: " + (companion is DogCompanion ? (Damage * 2) : Damage) + "\nARMOR: " + ActualArmor + " / " + MaxArmor, UserInterface.TextPosition.TopLeft);
+            UserInterface.Singleton.SetText($"HP:{ActualHealth} / {MaxHealth} \nDMG: {(companion is DogCompanion ? (Damage * 2) : Damage)}\nARMOR: {ActualArmor} / {MaxArmor} \nCRIT: {Crit}%", UserInterface.TextPosition.TopLeft);
         }
 
         protected override void OnUpdate(float deltaTime)
@@ -112,7 +114,11 @@ namespace DungeonCrawl.Actors.Characters
         {
             if (actor is Character enemy)
             {
-                enemy.ApplyDamage(companion is DogCompanion ? Damage * 2: Damage);
+                System.Random random = new System.Random();
+                int dmg = companion is DogCompanion ? Damage * 2 : Damage;
+                dmg = random.Next(100) < Crit ? dmg * 2 : dmg;
+
+                enemy.ApplyDamage(dmg);
             }
         }
 

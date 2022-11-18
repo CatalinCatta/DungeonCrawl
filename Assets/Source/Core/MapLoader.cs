@@ -157,8 +157,15 @@ namespace DungeonCrawl.Core
                 case 'R':
                     ActorManager.Singleton.Spawn<Dor2>(position);
                     break;
+                case 'r':
+                    ActorManager.Singleton.Spawn<Floor>(position);
+                    ActorManager.Singleton.Spawn<Ring1>(position);
+                    break;
                 case 'T':
                     ActorManager.Singleton.Spawn<Torch>(position);
+                    break;
+                case 's':
+                    ActorManager.Singleton.Spawn<SpiderWeb>(position);
                     break;
                 case 'W':
                     ActorManager.Singleton.Spawn<Window>(position);

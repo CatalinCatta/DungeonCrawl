@@ -44,7 +44,7 @@ namespace DungeonCrawl.Actors.Characters
                 }
 
                 yield return timer;
-                if (ActualArmor == 0) { ChangePosition(); HitEnemy(); }
+                if (ActualArmor == 0) { ChangePosition();  HitEnemy(); }
             }
         }
 
@@ -55,8 +55,6 @@ namespace DungeonCrawl.Actors.Characters
             {
                 player.ApplyDamage(Damage);
             }
-
-            SumonAcolites();
         }
 
 
