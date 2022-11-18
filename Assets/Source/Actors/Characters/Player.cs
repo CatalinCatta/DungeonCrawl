@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using Assets.Source.Core;
 using DungeonCrawl.Core;
 using DungeonCrawl.Actors.Static;
@@ -19,6 +20,7 @@ namespace DungeonCrawl.Actors.Characters
         public bool Map = false;
         public bool Boss1Killed = false;
         public int Crit = 0;
+        public int DodgeChance = 0;
 
         public override void Starter()
         {
@@ -36,7 +38,7 @@ namespace DungeonCrawl.Actors.Characters
 
         public void ShowStats()
         {
-            UserInterface.Singleton.SetText($"HP:{ActualHealth} / {MaxHealth} \nDMG: {(companion is DogCompanion ? (Damage * 2) : Damage)}\nARMOR: {ActualArmor} / {MaxArmor} \nCRIT: {Crit}%", UserInterface.TextPosition.TopLeft);
+            UserInterface.Singleton._playerStatsText.text = $"{ActualHealth}/{MaxHealth} \n{(companion is DogCompanion ? (Damage * 2) : Damage)} \n{ActualArmor}  /{MaxArmor} \n{DodgeChance}% \n{Crit}%";
         }
 
         protected override void OnUpdate(float deltaTime)

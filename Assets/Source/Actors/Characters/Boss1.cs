@@ -21,7 +21,7 @@ namespace DungeonCrawl.Actors.Characters
         protected override void OnDeath()
         {
             ActorManager.Singleton.DestroyActor(ActorManager.Singleton.GetActorAt((13, -36)));
-
+            UserInterface.Singleton.SetText("", UserInterface.TextPosition.MiddleCenter);
             ActorManager.Singleton.GetActor<Player>().Boss1Killed = true;
         }
 
@@ -124,7 +124,7 @@ namespace DungeonCrawl.Actors.Characters
 
         public void ShowStats()
         {
-            UserInterface.Singleton.SetText("HP: " + ActualHealth + " / " + MaxHealth + "\nARMOR: " + ActualArmor + " / " + MaxArmor, UserInterface.TextPosition.TopCenter);
+            UserInterface.Singleton.SetText($"{ActualHealth}/{MaxHealth}\n{ActualArmor}/{MaxArmor}", UserInterface.TextPosition.MiddleCenter);
         }
 
         public override void Starter()
