@@ -18,7 +18,7 @@ namespace DungeonCrawl.Actors.Characters
 
         protected override void OnDeath()
         {
-            if (ghost != null && ghost.ActualHealth > 0) { ghost.ApplyDamage(ghost.MaxHealth); }
+            if (ghost != null && ghost.ActualHealth > 0) { ghost.ApplyDamage(Damage); }
         }
 
         public override void Drop()
@@ -35,6 +35,7 @@ namespace DungeonCrawl.Actors.Characters
         {
             MaxHealth = 20;
             ActualHealth = 20;
+            Damage = 999;
         }
 
         public override int DefaultSpriteId => 672;

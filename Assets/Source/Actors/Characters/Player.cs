@@ -20,7 +20,7 @@ namespace DungeonCrawl.Actors.Characters
         public Actor companion;
         public bool Map = false;
         public bool Boss1Killed = false;
-        public int Crit = 0;
+        public int Crit = 50;
         public int DodgeChance = 0;
         private GameObject viewer;
 
@@ -123,10 +123,11 @@ namespace DungeonCrawl.Actors.Characters
             if (actor is Character enemy)
             {
                 System.Random random = new System.Random();
-                int dmg = companion is DogCompanion ? Damage * 2 : Damage;
-                dmg = random.Next(100) < Crit ? dmg * 2 : dmg;
 
-                enemy.ApplyDamage(dmg);
+                int crit = random.Next(100) < Crit ? 2 : 1;
+                int damage = companion is DogCompanion ? (Damage * crit * 2) : (Damage * crit);
+
+                enemy.ApplyDamage(damage, null, crit.ToString());
             }
         }
 

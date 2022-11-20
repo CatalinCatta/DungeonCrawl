@@ -3,6 +3,7 @@ using System.Linq;
 using DungeonCrawl.Actors;
 using UnityEngine;
 using UnityEngine.U2D;
+using DungeonCrawl.Actors.Characters;
 
 namespace DungeonCrawl.Core
 {
@@ -114,6 +115,7 @@ namespace DungeonCrawl.Core
         public T Spawn<T>(int x, int y, string actorName = null) where T : Actor
         {
             var go = new GameObject();
+
             go.AddComponent<SpriteRenderer>();
 
             var component = go.AddComponent<T>();
@@ -121,6 +123,11 @@ namespace DungeonCrawl.Core
             go.name = actorName ?? component.DefaultName;
             component.Position = (x, y);
 
+            if (typeof(T).IsSubclassOf(typeof(Character)))
+            {
+                var audio = go.AddComponent<AudioSource>();
+                audio.clip = Resources.Load($"Audio/{component.DefaultName}-hit") as AudioClip;
+            }
             _allActors.Add(component);
 
             return component;

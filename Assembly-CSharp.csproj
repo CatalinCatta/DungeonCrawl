@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -60,6 +60,8 @@
     <Compile Include="Assets\Source\Actors\Static\Dog.cs" />
     <Compile Include="Assets\Source\Actors\Static\HidenSecret.cs" />
     <Compile Include="Assets\Source\Actors\Static\Ring1.cs" />
+    <Compile Include="Assets\Materials\LightFlickerEffect.cs" />
+    <Compile Include="Assets\Source\Actors\Static\Gate.cs" />
     <Compile Include="Assets\Source\Core\MapLoader.cs" />
     <Compile Include="Assets\Source\Actors\Static\Sword.cs" />
     <Compile Include="Assets\Source\Actors\Static\SecretEnterance.cs" />
@@ -97,8 +99,6 @@
     <Compile Include="Assets\Source\Core\ActorManager.cs" />
     <Compile Include="Assets\Source\Actors\Static\SpiderWeb.cs" />
     <Compile Include="Assets\Source\Actors\Static\Floor2.cs" />
-    <Compile Include="Assets\Source\Actors\Static\Gate.cs" />
-    <Compile Include="Assets\Materials\LightFlickerEffect.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

@@ -22,8 +22,6 @@ namespace DungeonCrawl.Actors.Characters
         {
             if (actor is Player player)
             {
-                Debug.Log(Position);
-                Debug.Log(Position);
                 if (Position == (6, -8))
                 {
                     UserInterface.Singleton.SetText("Press SPACE for combat", UserInterface.TextPosition.TopRight);

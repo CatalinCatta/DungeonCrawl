@@ -9,7 +9,7 @@ namespace DungeonCrawl.Actors.Characters
 {
     public class Ghost : Character
     {
-        private int Curse = 0;
+        public int Curse = 0;
         public (int x, int y) GravePosition;
 
         public override bool OnCollision(Actor anotherActor)
@@ -37,7 +37,14 @@ namespace DungeonCrawl.Actors.Characters
             {
                 yield return new WaitForSeconds(0.3f);
                 RandomPosition();
-                ActorManager.Singleton.GetActor<Player>().ApplyDamage(Curse, "Curse");
+                yield return new WaitForSeconds(0.3f);
+                RandomPosition();
+                yield return new WaitForSeconds(0.3f);
+                RandomPosition();
+                if (Curse > 0)
+                {
+                    ActorManager.Singleton.GetActor<Player>().ApplyDamage(Curse, "Curse");
+                }
             }
         }
 
