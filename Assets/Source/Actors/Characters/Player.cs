@@ -6,6 +6,7 @@ using DungeonCrawl.Actors.Static;
 using System.Linq;
 using System;
 
+
 namespace DungeonCrawl.Actors.Characters
 {
     public class Player : Character
@@ -21,16 +22,21 @@ namespace DungeonCrawl.Actors.Characters
         public bool Boss1Killed = false;
         public int Crit = 0;
         public int DodgeChance = 0;
+        private GameObject viewer;
+
 
         public override void Starter()
         {
             inventoryDisplay = GameObject.Find("Inventory");
+            viewer = GameObject.Find("Viewer");
+
             if (inventoryDisplay != null) { inventoryDisplay.SetActive(false); }
             MaxHealth = 100;
             ActualHealth = 100;
             Damage = 1;
             ActualArmor = 0;
             MaxArmor = 0;
+
 
             ShowStats();
             UserInterface.Singleton.SetText("Look, there is a sword, let's pick it up!", UserInterface.TextPosition.TopCenter);
@@ -79,7 +85,7 @@ namespace DungeonCrawl.Actors.Characters
             if (Input.GetKeyDown(KeyCode.I))
             {
                 // inventory
-                inventory.ShowInventory(inventoryDisplay);
+                inventory.ShowInventory(inventoryDisplay, viewer);
             }
 
             if (Input.GetKeyDown(KeyCode.Space))
@@ -102,7 +108,7 @@ namespace DungeonCrawl.Actors.Characters
         {
             UserInterface.Singleton.SetText("", UserInterface.TextPosition.TopRight);
 
-            if (ItemOnGround.OnGround && ItemOnGround != null)
+            if (ItemOnGround != null && ItemOnGround.OnGround)
             {
                 
                 if (ItemOnGround is Sword) { UserInterface.Singleton.SetText("Nice! Now equip it.. Hint: Press I!", UserInterface.TextPosition.TopCenter); }
@@ -144,21 +150,21 @@ namespace DungeonCrawl.Actors.Characters
             SecretShowed = !SecretShowed;
             foreach (var wall in Resources.FindObjectsOfTypeAll<GameObject>().Where(obj => obj.name.Contains("Hiden")))
             {
-                var wall2 = wall.GetComponent<Renderer>();
-                Color color = wall2.material.color;
+                var wall2 = wall.GetComponent<SpriteRenderer>();
+                Color color = wall2.color;
                 color.a = SecretShowed ? 1 : 0;
-                wall2.material.color = color;
+                wall2.color = color;
             }
 
             foreach (var wall in Resources.FindObjectsOfTypeAll<GameObject>().Where(obj => !obj.name.Contains("Hiden")))
             {
-                var wall2 = wall.GetComponent<Renderer>();
-
-                if (wall2 != null && wall.name != this.name && wall.name != this.companion.name)
+                var wall2 = wall.GetComponent<SpriteRenderer>();
+                
+                if ((wall2 != null && wall.name != this.name) && (this.companion == null || (this.companion != null && wall.name != this.companion.name)))
                 {
-                    Color color = wall2.material.color;
+                    Color color = wall2.color;
                     color.a = SecretShowed ? (float)0.5 : 1;
-                    wall2.material.color = color;
+                    wall2.color = color;
                 }
             }
 

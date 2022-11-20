@@ -7,5 +7,7 @@ namespace DungeonCrawl.Actors.Static
 
         public override bool Detectable => false;
 
+        public override int Z => 1;
+
     }
 }

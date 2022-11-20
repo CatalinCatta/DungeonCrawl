@@ -6,5 +6,8 @@
         public override string DefaultName => "Floor";
 
         public override bool Detectable => false;
+        
+        public override int Z => 1;
+
     }
 }

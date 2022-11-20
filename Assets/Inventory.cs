@@ -40,15 +40,17 @@ namespace DungeonCrawl.Core
 
         }
 
-        public void ShowInventory(GameObject display)
+        public void ShowInventory(GameObject display, GameObject viewer)
         {
             if (onOff)
             {
                 display.SetActive(false);
                 onOff = false;
+                viewer.SetActive(true);
             }
             else
             {
+                viewer.SetActive(false);
                 display.SetActive(true);
                 onOff = true;
                 for (int i = 0; i < 12; i++)

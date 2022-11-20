@@ -22,7 +22,6 @@ namespace DungeonCrawl.Actors.Characters
         {
             ActorManager.Singleton.DestroyActor(ActorManager.Singleton.GetActorAt((13, -36)));
             UserInterface.Singleton.SetText("", UserInterface.TextPosition.MiddleCenter);
-            ActorManager.Singleton.GetActor<Player>().Boss1Killed = true;
         }
 
         IEnumerator Start()
@@ -129,14 +128,15 @@ namespace DungeonCrawl.Actors.Characters
 
         public override void Starter()
         {
+            ActorManager.Singleton.GetActor<Player>().Boss1Killed = true;
             MaxHealth = 100;
             ActualHealth = 100;
             Damage = 20;
             ActualArmor = 50;
             MaxArmor = 50;
 
-            ActorManager.Singleton.Spawn<Wall>((13, -36));
-            ActorManager.Singleton.Spawn<Wall>((22, -32));
+            ActorManager.Singleton.Spawn<Gate>((13, -36));
+            ActorManager.Singleton.Spawn<Gate>((22, -32));
             
             ShowStats();
         }

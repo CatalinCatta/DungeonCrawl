@@ -56,6 +56,7 @@ namespace DungeonCrawl.Actors
                     playerTemp.companion.Position = Position;
                 }
                 UserInterface.Singleton.SetText("", UserInterface.TextPosition.TopRight);
+                playerTemp.ItemOnGround = null;
             }
 
             if (actorAtTargetPosition == null)
@@ -115,10 +116,13 @@ namespace DungeonCrawl.Actors
                         
                         foreach (var wall in Resources.FindObjectsOfTypeAll<GameObject>())
                         {
-                            var wall2 = wall.GetComponent<Renderer>();
-                            Color color = wall2.material.color;
-                            color.a = 1;
-                            wall2.material.color = color;
+                            var wall2 = wall.GetComponent<SpriteRenderer>();
+                            if (wall2 != null)
+                            {
+                                Color color = wall2.color;
+                                color.a = 1;
+                                wall2.color = color;
+                            }
                         }
 
 
@@ -131,12 +135,12 @@ namespace DungeonCrawl.Actors
                         
                         foreach (var wall in Resources.FindObjectsOfTypeAll<GameObject>().Where(obj => !obj.name.Contains("Hiden")))
                         {
-                            var wall2 = wall.GetComponent<Renderer>();
-                            if (wall2 != null && wall.name != this.name && wall.name != player.companion.name)
+                            var wall2 = wall.GetComponent<SpriteRenderer>();
+                            if ((wall2 != null && wall.name != this.name) && (player.companion == null || (player.companion != null && wall.name != player.companion.name)))
                             {
-                                Color color = wall2.material.color;
+                                Color color = wall2.color;
                                 color.a = (float)0.5;
-                                wall2.material.color = color;
+                                wall2.color = color;
                             }
                         }
 

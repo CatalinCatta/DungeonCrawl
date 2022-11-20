@@ -4,6 +4,7 @@ using System;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.Experimental.Rendering.Universal;
 
 namespace DungeonCrawl.Core
 {
@@ -42,7 +43,8 @@ namespace DungeonCrawl.Core
             // Set default camera size and position
             CameraController.Singleton.Size = 5;
             CameraController.Singleton.Position = playerCoord;
-            HideSecrets();
+            SetUp();
+
         }
 
         private static void SpawnActor(char c, (int x, int y) position)
@@ -162,6 +164,7 @@ namespace DungeonCrawl.Core
                     ActorManager.Singleton.Spawn<Ring1>(position);
                     break;
                 case 'T':
+                    ActorManager.Singleton.Spawn<Floor>(position);
                     ActorManager.Singleton.Spawn<Torch>(position);
                     break;
                 case 's':
@@ -177,19 +180,43 @@ namespace DungeonCrawl.Core
             }
         }
 
-        private static void HideSecrets()
+        private static void SetUp()
         {
+
+            var playerLight = GameObject.Find("Player").AddComponent(typeof(Light2D)) as Light2D;
+            playerLight.pointLightOuterRadius = 5;
+            playerLight.shadowsEnabled = true;
+
+            foreach (var wall in Resources.FindObjectsOfTypeAll<GameObject>().Where(obj => obj.name.Contains("Wall")))
+            {
+                var wallShade = wall.AddComponent(typeof(ShadowCaster2D)) as ShadowCaster2D;
+
+                wallShade.selfShadows = true;
+            }
+
+            foreach (var torch in Resources.FindObjectsOfTypeAll<GameObject>().Where(obj => obj.name.Contains("Torch")))
+            {
+                var _ = torch.AddComponent(typeof(LightFlickerEffect)) as LightFlickerEffect;
+                var torchLight = torch.AddComponent(typeof(Light2D)) as Light2D;
+                torchLight.pointLightOuterRadius = 5;
+                torchLight.pointLightInnerRadius = 3;
+                torchLight.shadowsEnabled = true;
+                torchLight.shadowIntensity = 0.9f;
+                torchLight.color = Color.yellow;
+            }
 
             foreach (var floor in Resources.FindObjectsOfTypeAll<GameObject>().Where(obj => obj.name == "HidenFloor"))
             {
-                floor.GetComponent<Renderer>().material.color = new Color32(0, 255, 0, 255);
+                floor.GetComponent<SpriteRenderer>().color = Color.green;
             }
+
             foreach (var wall in Resources.FindObjectsOfTypeAll<GameObject>().Where(obj => obj.name.Contains("Hiden")))
             {
-                var wall2 = wall.GetComponent<Renderer>();
-                Color color = wall2.material.color;
+                var wall2 = wall.GetComponent<SpriteRenderer>();
+                Color color = wall2.color;
                 color.a = 0;
-                wall2.material.color = color;
+                wall2.color = color;
+
             }
 
         }
