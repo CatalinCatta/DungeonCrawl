@@ -1,4 +1,4 @@
-namespace DungeonCrawl.Actors.Static
+namespace Source.Actors.Static
 {
     public class Meat : Actor
     {
@@ -7,10 +7,11 @@ namespace DungeonCrawl.Actors.Static
 
         public override bool OnGround => true;
 
-        public override bool OnCollision(Actor anotherActor)
+        protected override bool OnCollision(Actor anotherActor)
         {
             return true;
         }
-        public override int Z => -1;
+
+        protected override int Z => -1;
     }
 }

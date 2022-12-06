@@ -1,14 +1,13 @@
-﻿using UnityEngine;
-using System.Collections;
-using DungeonCrawl.Core;
-using DungeonCrawl.Actors.Static;
-using Assets.Source.Core;
+﻿using System.Collections;
+using Source.Actors.Static;
+using Source.Core;
+using UnityEngine;
 
-namespace DungeonCrawl.Actors.Characters
+namespace Source.Actors.Characters
 {
     public class Skeleton : Character
     {
-        public override bool OnCollision(Actor anotherActor)
+        protected override bool OnCollision(Actor anotherActor)
         {
             return false;
         }
@@ -18,22 +17,27 @@ namespace DungeonCrawl.Actors.Characters
             Debug.Log("Well, I was already dead anyway...");
         }
 
-        public override void Hit(Actor actor)
+        protected override void Hit(Actor actor)
         {
-            if (actor is Player player)
+            if (!(actor is Player player)) return;
+
+            if (Position == (6, -8))
             {
-                if (Position == (6, -8))
-                {
-                    UserInterface.Singleton.SetText("Press SPACE for combat", UserInterface.TextPosition.TopRight);
-                }
-                player.ApplyDamage(Damage);
+                UserInterface.Singleton.SetText("Press SPACE for combat", UserInterface.TextPosition.TopRight);
             }
+
+            player.ApplyDamage(Damage);
         }
 
-        IEnumerator Start()
+        private IEnumerator Start()
         {
             while (true)
             {
+                if (ActualHealth <= 0)
+                {
+                    break;
+                }
+
                 yield return new WaitForSeconds(1f);
                 HitEnemy();
             }
@@ -46,7 +50,7 @@ namespace DungeonCrawl.Actors.Characters
             Damage = 5;
         }
 
-        public override void Drop()
+        protected override void Drop()
         {
             if (Position == (6, -8))
             {
@@ -56,10 +60,16 @@ namespace DungeonCrawl.Actors.Characters
             {
                 var rand = new System.Random();
                 var dropRate = rand.Next(100);
-                if (dropRate < 20) { ActorManager.Singleton.Spawn<Heal>(Position); }
-                if (dropRate == 20) { ActorManager.Singleton.Spawn<Meat>(Position); }
-            }
+                if (dropRate < 20)
+                {
+                    ActorManager.Singleton.Spawn<Heal>(Position);
+                }
 
+                if (dropRate == 20)
+                {
+                    ActorManager.Singleton.Spawn<Meat>(Position);
+                }
+            }
         }
 
         public override int DefaultSpriteId => 316;

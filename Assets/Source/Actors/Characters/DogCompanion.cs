@@ -1,4 +1,4 @@
-namespace DungeonCrawl.Actors.Static
+namespace Source.Actors.Characters
 {
     public class DogCompanion : Actor
     {
@@ -7,6 +7,6 @@ namespace DungeonCrawl.Actors.Static
 
         public override bool Detectable => false;
 
-        public override int Z => -1;
+        protected override int Z => -1;
     }
 }

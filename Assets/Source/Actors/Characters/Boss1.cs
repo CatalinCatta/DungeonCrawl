@@ -1,19 +1,16 @@
-using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
-using DungeonCrawl.Core;
-using DungeonCrawl.Actors.Static;
-using Assets.Source.Core;
 using System;
-using UnityEngine.EventSystems;
+using System.Collections;
+using Source.Actors.Static;
+using Source.Core;
+using UnityEngine;
 
-namespace DungeonCrawl.Actors.Characters
+namespace Source.Actors.Characters
 {
     public class Boss1 : Character
     {
         public (int x, int y) GravePosition;
 
-        public override bool OnCollision(Actor anotherActor)
+        protected override bool OnCollision(Actor anotherActor)
         {
             return false;
         }
@@ -24,31 +21,41 @@ namespace DungeonCrawl.Actors.Characters
             UserInterface.Singleton.SetText("", UserInterface.TextPosition.MiddleCenter);
         }
 
-        IEnumerator Start()
+        private IEnumerator Start()
         {
-            WaitForSeconds timer = new WaitForSeconds(1f);
+            var timer = new WaitForSeconds(1f);
             while (true)
             {
+                if (ActualHealth <= 0)
+                {
+                    break;
+                }
+
                 yield return timer;
-                if (ActualArmor == 0) { ChangePosition(); }
-                
+                if (actualArmor == 0)
+                {
+                    ChangePosition();
+                }
+
                 yield return timer;
-                if (ActualArmor == 0)
+                if (actualArmor == 0)
                 {
                     ChangePosition();
                 }
                 else
                 {
-                    SumonAcolites();
+                    SummonAcolytes();
                 }
 
                 yield return timer;
-                if (ActualArmor == 0) { ChangePosition();  HitEnemy(); }
+                if (actualArmor != 0) continue;
+                ChangePosition();
+                HitEnemy();
             }
         }
 
 
-        public override void Hit(Actor actor)
+        protected override void Hit(Actor actor)
         {
             if (actor is Player player)
             {
@@ -57,95 +64,99 @@ namespace DungeonCrawl.Actors.Characters
         }
 
 
-        public void SumonAcolites(string drop = null)
+        private static void SummonAcolytes(string drop = null)
         {
-            int counter = 0;
-            System.Random random = new System.Random();
+            var counter = 0;
+            var random = new System.Random();
 
             while (true)
             {
-                (int, int) position = (random.Next(14, 31), -random.Next(33, 40));
+                var position = (random.Next(14, 31), -random.Next(33, 40));
                 var slot = ActorManager.Singleton.GetActorAt(position);
 
-                if (slot == null)
+                if (slot != null) continue;
+                if (drop != null)
                 {
-
-                    if (drop != null)
+                    switch (counter)
                     {
-                        if (counter == 0)
-                        {
+                        case 0:
                             ActorManager.Singleton.Spawn<Armor>(position);
-                        }
-                        if (counter == 1)
-                        {
-                            ActorManager.Singleton.Spawn<Meat>(position);
-                        }
-                        if (counter == 2)
-                        {
+                            break;
+                        case 1:
                             ActorManager.Singleton.Spawn<Meat>(position);
                             break;
-                        }
                     }
-                    else
+
+                    if (counter == 2)
                     {
-                        var randomEnemy = random.Next(3);
-                        if (randomEnemy == 0)
-                        {
+                        ActorManager.Singleton.Spawn<Meat>(position);
+                        break;
+                    }
+                }
+                else
+                {
+                    var randomEnemy = random.Next(3);
+                    switch (randomEnemy)
+                    {
+                        case 0:
                             ActorManager.Singleton.Spawn<Skeleton>(position);
-                        }
-                        if (randomEnemy == 1)
-                        {
+                            break;
+                        case 1:
                             ActorManager.Singleton.Spawn<Zombie>(position);
-                        }
-                        if (randomEnemy == 2)
-                        {
+                            break;
+                        case 2:
                             ActorManager.Singleton.Spawn<Grave>(position);
                             ActorManager.Singleton.Spawn<Ghost>(position);
-                            ActorManager.Singleton.GetActorAt<Grave>(position).ghost = ActorManager.Singleton.GetActorAt<Ghost>(position);
+                            ActorManager.Singleton.GetActorAt<Grave>(position).ghost =
+                                ActorManager.Singleton.GetActorAt<Ghost>(position);
                             ActorManager.Singleton.GetActorAt<Ghost>(position).GravePosition = position;
-                        }
-                        if (counter == 1) { break; }
+                            break;
                     }
-                    counter ++;
-                }
-            }
 
+                    if (counter == 1)
+                    {
+                        break;
+                    }
+                }
+
+                counter++;
+            }
         }
 
-        public void ChangePosition()
+        private void ChangePosition()
         {
-            Array values = Enum.GetValues(typeof(Direction));
-            System.Random random = new System.Random();
+            var values = Enum.GetValues(typeof(Direction));
+            var random = new System.Random();
             var direction = (Direction)values.GetValue(random.Next(values.Length));
             TryMove(direction);
-
         }
 
         public void ShowStats()
         {
-            UserInterface.Singleton.SetText($"{ActualHealth}/{MaxHealth}\n{ActualArmor}/{MaxArmor}", UserInterface.TextPosition.MiddleCenter);
+            UserInterface.Singleton.SetText($"{ActualHealth}/{MaxHealth}\n{actualArmor}/{maxArmor}",
+                UserInterface.TextPosition.MiddleCenter);
         }
 
         public override void Starter()
         {
-            ActorManager.Singleton.GetActor<Player>().Boss1Killed = true;
+            ActorManager.Singleton.GetActor<Player>().boss1Killed = true;
             MaxHealth = 100;
             ActualHealth = 100;
             Damage = 20;
-            ActualArmor = 50;
-            MaxArmor = 50;
+            actualArmor = 50;
+            maxArmor = 50;
 
             ActorManager.Singleton.Spawn<Gate>((13, -36));
             ActorManager.Singleton.Spawn<Gate>((22, -32));
-            
+
             ShowStats();
         }
 
         public void TrueForm()
         {
             SetSprite(169);
-            SumonAcolites("items");
-            ActualArmor = 0;
+            SummonAcolytes("items");
+            actualArmor = 0;
             ShowStats();
         }
 

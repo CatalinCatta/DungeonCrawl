@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace DungeonCrawl.Core
+namespace Source.Core
 {
     /// <summary>
     ///     Loads the initial map and can be used for keeping some important game variables

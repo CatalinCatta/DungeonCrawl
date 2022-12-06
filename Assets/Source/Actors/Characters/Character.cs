@@ -1,45 +1,42 @@
-﻿using DungeonCrawl.Core;
+﻿using System.Collections;
 using System.Collections.Generic;
+using Source.Actors.Static;
+using Source.Core;
 using UnityEngine;
-using Assets.Source.Core;
-using DungeonCrawl.Actors.Static;
-using System;
-using UnityEngine.UI;
-using System.Collections;
+using UnityEngine.Serialization;
 
-
-namespace DungeonCrawl.Actors.Characters
+namespace Source.Actors.Characters
 {
     public abstract class Character : Actor
     {
-        public int MaxHealth { get; set; }
-        public int ActualHealth { get; set; }
+        public int MaxHealth { get; protected set; }
+        public int ActualHealth { get; protected set; }
         public int Damage { get; set; }
-        public int MaxArmor = 0;
-        public int ActualArmor = 0;
-        public int Crit = 1;
+        [FormerlySerializedAs("MaxArmor")] public int maxArmor;
+        [FormerlySerializedAs("ActualArmor")] public int actualArmor;
+        [field: FormerlySerializedAs("Crt")] public int Crt { get; set; }
 
         public void ApplyDamage(int damage, string curse = null, string criticalDmg = null)
         {
-            var HitImg = this.HitAnimation(damage, criticalDmg, curse);
+            var hitDmg = this.HitAnimation(damage, criticalDmg, curse);
             //if (!(this is Player))
-            
+
             var actor = this.gameObject;
 
-            var audio = actor.GetComponent(typeof(AudioSource)) as AudioSource;
-            
-            if(!audio.isPlaying)
+            var audioSource = actor.GetComponent(typeof(AudioSource)) as AudioSource;
+
+            if (audioSource != null && !audioSource.isPlaying)
             {
-                audio.Play();
+                audioSource.Play();
             }
 
             // }
 
-            if (this.ActualArmor > 0 && curse == null)
+            if (this.actualArmor > 0 && curse == null)
             {
-                this.ActualArmor -= damage / 2;
+                this.actualArmor -= damage / 2;
 
-                if (this is Boss1 b1 && ActualArmor <= 0)
+                if (this is Boss1 b1 && actualArmor <= 0)
                 {
                     b1.TrueForm();
                 }
@@ -65,13 +62,12 @@ namespace DungeonCrawl.Actors.Characters
                 Drop();
                 OnDeath();
 
-                if (!(this is Player))
+                if (!(this is Player) && audioSource != null)
                 {
-                    audio.clip = Resources.Load($"Audio/{this.name}-die") as AudioClip;
-                    audio.Play();
+                    audioSource.clip = Resources.Load($"Audio/{this.name}-die") as AudioClip;
+                    audioSource.Play();
 
                     StartCoroutine(this.DeathSound());
-
                 }
                 else
                 {
@@ -79,46 +75,56 @@ namespace DungeonCrawl.Actors.Characters
                 }
             }
 
-            StartCoroutine(waiter_not_that_waiter_just_waiter(HitImg));
+            StartCoroutine(waiter_not_that_waiter_just_waiter(hitDmg));
         }
 
 
-        private GameObject HitAnimation(int dmg, string criticalHit, string Curse)
+        private GameObject HitAnimation(int dmg, string criticalHit, string curse)
         {
-            var NewObj1 = new GameObject();
-            NewObj1.transform.position = new Vector3(this.Position.x, this.Position.y, -5);
-            NewObj1.transform.parent = this.gameObject.transform;
+            var newObj1 = new GameObject
+            {
+                transform =
+                {
+                    position = new Vector3(this.Position.x, this.Position.y, -5),
+                    parent = this.gameObject.transform
+                }
+            };
 
-            var NewImage = NewObj1.AddComponent<SpriteRenderer>();
-            NewImage.sprite = criticalHit == "2" ? ActorManager.Singleton.GetSprite(553) : Curse == "Curse" ? ActorManager.Singleton.GetSprite(609) : ActorManager.Singleton.GetSprite(551);
-            NewImage.color = criticalHit == "2" ? Color.red : Curse == "Curse" ? Color.black : Color.grey;
+            var newImage = newObj1.AddComponent<SpriteRenderer>();
+            newImage.sprite = criticalHit == "2" ? ActorManager.Singleton.GetSprite(553) :
+                curse == "Curse" ? ActorManager.Singleton.GetSprite(609) : ActorManager.Singleton.GetSprite(551);
+            newImage.color = criticalHit == "2" ? Color.red : curse == "Curse" ? Color.black : Color.grey;
 
 
-            var NewObj2 = new GameObject();
-            NewObj2.transform.position = new Vector3(this.Position.x, this.Position.y, -6);
-            NewObj2.transform.parent = NewObj1.gameObject.transform;
+            var newObj2 = new GameObject
+            {
+                transform =
+                {
+                    position = new Vector3(this.Position.x, this.Position.y, -6),
+                    parent = newObj1.gameObject.transform
+                }
+            };
 
-            var Damage = NewObj2.AddComponent<TextMesh>();
-            Damage.text = dmg.ToString();
-            Damage.fontSize = 8;
+            var damage = newObj2.AddComponent<TextMesh>();
+            damage.text = dmg.ToString();
+            damage.fontSize = 8;
 
-            return NewObj1;
+            return newObj1;
         }
 
 
-        IEnumerator waiter_not_that_waiter_just_waiter(GameObject NewObj)
+        private static IEnumerator waiter_not_that_waiter_just_waiter(Object newObj)
         {
             yield return new WaitForSeconds(0.1f);
-            Destroy(NewObj);
+            Destroy(newObj);
         }
 
-        IEnumerator DeathSound()
+        private IEnumerator DeathSound()
         {
             this.Position = (1000, 1000);
             yield return new WaitForSeconds(3f);
             ActorManager.Singleton.DestroyActor(this);
         }
-
 
 
         public void Heal(int hp)
@@ -135,13 +141,13 @@ namespace DungeonCrawl.Actors.Characters
         /// <summary>
         ///     All characters are drawn "above" floor etc
         /// </summary>
-        public override int Z => -2;
+        protected override int Z => -2;
 
         public abstract void Starter();
 
-        public void HitEnemy()
+        protected void HitEnemy()
         {
-            List<Actor> actors = new List<Actor>
+            var actors = new List<Actor>
             {
                 ActorManager.Singleton.GetActorAt((Position.x, Position.y + 1)),
                 ActorManager.Singleton.GetActorAt((Position.x, Position.y - 1)),
@@ -149,20 +155,27 @@ namespace DungeonCrawl.Actors.Characters
                 ActorManager.Singleton.GetActorAt((Position.x + 1, Position.y))
             };
 
-            foreach(Actor actor in actors)
+            foreach (var actor in actors)
             {
                 Hit(actor);
             }
         }
 
-        public abstract void Hit(Actor actor);
+        protected abstract void Hit(Actor actor);
 
-        public virtual void Drop()
+        protected virtual void Drop()
         {
             var rand = new System.Random();
             var dropRate = rand.Next(100);
-            if (dropRate < 20) { ActorManager.Singleton.Spawn<Heal>(Position); }
-            if (dropRate == 20) { ActorManager.Singleton.Spawn<Meat>(Position); }
+            if (dropRate < 20)
+            {
+                ActorManager.Singleton.Spawn<Heal>(Position);
+            }
+
+            if (dropRate == 20)
+            {
+                ActorManager.Singleton.Spawn<Meat>(Position);
+            }
         }
     }
 }

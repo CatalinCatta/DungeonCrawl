@@ -1,18 +1,16 @@
-namespace DungeonCrawl.Actors.Static
+namespace Source.Actors.Static
 {
     public class Key : Actor
     {
-
         public override int DefaultSpriteId => 559;
         public override string DefaultName => "Key";
         public override bool OnGround => true;
 
-        public override bool OnCollision(Actor anotherActor)
+        protected override bool OnCollision(Actor anotherActor)
         {
             return true;
         }
 
-        public override int Z => -1;
-            
+        protected override int Z => -1;
     }
 }

@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DungeonCrawl.Actors;
+using Source.Actors;
+using Source.Actors.Characters;
 using UnityEngine;
 using UnityEngine.U2D;
-using DungeonCrawl.Actors.Characters;
 
-namespace DungeonCrawl.Core
+namespace Source.Core
 {
     /// <summary>
     ///     Main class for Actor management - spawning, destroying, detecting at positions, etc
@@ -112,21 +112,20 @@ namespace DungeonCrawl.Core
         /// <param name="y">Y coordinate</param>
         /// <param name="actorName">Actor's name (optional)</param>
         /// <returns></returns>
-        public T Spawn<T>(int x, int y, string actorName = null) where T : Actor
+        private T Spawn<T>(int x, int y, string actorName = null) where T : Actor
         {
             var go = new GameObject();
-
             go.AddComponent<SpriteRenderer>();
 
             var component = go.AddComponent<T>();
-
+            Debug.Log(component);
             go.name = actorName ?? component.DefaultName;
             component.Position = (x, y);
 
             if (typeof(T).IsSubclassOf(typeof(Character)))
             {
-                var audio = go.AddComponent<AudioSource>();
-                audio.clip = Resources.Load($"Audio/{component.DefaultName}-hit") as AudioClip;
+                var audioSource = go.AddComponent<AudioSource>();
+                audioSource.clip = Resources.Load($"Audio/{component.DefaultName}-hit") as AudioClip;
             }
             _allActors.Add(component);
 

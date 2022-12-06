@@ -1,9 +1,9 @@
-namespace DungeonCrawl.Actors.Static
+namespace Source.Actors.Static
 {
     public class StairsDown : Actor
     {
         public override int DefaultSpriteId => 290;
         public override string DefaultName => "StairsDown";
-        public override int Z => -1;
+        protected override int Z => -1;
     }
 }

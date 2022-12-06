@@ -1,12 +1,13 @@
-﻿using DungeonCrawl.Actors.Characters;
-using DungeonCrawl.Actors.Static;
-using System;
-using System.Text.RegularExpressions;
-using UnityEngine;
+﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
+using Materials;
+using Source.Actors.Characters;
+using Source.Actors.Static;
+using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
 
-namespace DungeonCrawl.Core
+namespace Source.Core
 {
     /// <summary>
     ///     MapLoader is used for constructing maps from txt files
@@ -37,14 +38,17 @@ namespace DungeonCrawl.Core
                     var character = line[x];
                     SpawnActor(character, (x, -y));
 
-                    if (character == 'P') { playerCoord = (x, -y); }
+                    if (character == 'P')
+                    {
+                        playerCoord = (x, -y);
+                    }
                 }
             }
+
             // Set default camera size and position
             CameraController.Singleton.Size = 5;
             CameraController.Singleton.Position = playerCoord;
             SetUp();
-
         }
 
         private static void SpawnActor(char c, (int x, int y) position)
@@ -76,7 +80,8 @@ namespace DungeonCrawl.Core
                 case 'G':
                     ActorManager.Singleton.Spawn<Grave>(position);
                     ActorManager.Singleton.Spawn<Ghost>(position);
-                    ActorManager.Singleton.GetActorAt<Grave>(position).ghost = ActorManager.Singleton.GetActorAt<Ghost>(position);
+                    ActorManager.Singleton.GetActorAt<Grave>(position).ghost =
+                        ActorManager.Singleton.GetActorAt<Ghost>(position);
                     ActorManager.Singleton.GetActorAt<Ghost>(position).GravePosition = position;
                     ActorManager.Singleton.Spawn<Floor>(position);
                     break;
@@ -97,37 +102,37 @@ namespace DungeonCrawl.Core
                     ActorManager.Singleton.Spawn<Sword>(position);
                     break;
                 case '+':
-                    ActorManager.Singleton.Spawn<HidenFloor>(position);
+                    ActorManager.Singleton.Spawn<HiddenFloor>(position);
                     ActorManager.Singleton.Spawn<Wall>(position);
                     break;
                 case '`':
-                    ActorManager.Singleton.Spawn<HidenFloor>(position);
+                    ActorManager.Singleton.Spawn<HiddenFloor>(position);
                     break;
                 case '-':
-                    ActorManager.Singleton.Spawn<HidenWall1>(position);
+                    ActorManager.Singleton.Spawn<HiddenWall1>(position);
                     break;
                 case '=':
-                    ActorManager.Singleton.Spawn<HidenWall1>(position);
+                    ActorManager.Singleton.Spawn<HiddenWall1>(position);
                     ActorManager.Singleton.Spawn<Wall>(position);
                     break;
                 case '$':
-                    ActorManager.Singleton.Spawn<HidenWall1>(position);
-                    ActorManager.Singleton.Spawn<HidenFloor>(position);
+                    ActorManager.Singleton.Spawn<HiddenWall1>(position);
+                    ActorManager.Singleton.Spawn<HiddenFloor>(position);
                     ActorManager.Singleton.Spawn<Wall>(position);
                     break;
                 case '!':
-                    ActorManager.Singleton.Spawn<HidenWall1>(position);
-                    ActorManager.Singleton.Spawn<HidenFloor>(position);
+                    ActorManager.Singleton.Spawn<HiddenWall1>(position);
+                    ActorManager.Singleton.Spawn<HiddenFloor>(position);
                     break;
                 case '|':
-                    ActorManager.Singleton.Spawn<HidenWall2>(position);
+                    ActorManager.Singleton.Spawn<HiddenWall2>(position);
                     break;
                 case '*':
-                    ActorManager.Singleton.Spawn<HidenWall2>(position);
+                    ActorManager.Singleton.Spawn<HiddenWall2>(position);
                     ActorManager.Singleton.Spawn<Wall>(position);
                     break;
                 case '?':
-                    ActorManager.Singleton.Spawn<HidenSecret>(position);
+                    ActorManager.Singleton.Spawn<HiddenSecret>(position);
                     break;
                 case '/':
                     ActorManager.Singleton.Spawn<LeftRoof>(position);
@@ -182,22 +187,25 @@ namespace DungeonCrawl.Core
 
         private static void SetUp()
         {
-
             var playerLight = GameObject.Find("Player").AddComponent(typeof(Light2D)) as Light2D;
-            playerLight.pointLightOuterRadius = 5;
-            playerLight.shadowsEnabled = true;
+            if (playerLight != null)
+            {
+                playerLight.pointLightOuterRadius = 5;
+                playerLight.shadowsEnabled = true;
+            }
 
             foreach (var wall in Resources.FindObjectsOfTypeAll<GameObject>().Where(obj => obj.name.Contains("Wall")))
             {
                 var wallShade = wall.AddComponent(typeof(ShadowCaster2D)) as ShadowCaster2D;
 
-                wallShade.selfShadows = true;
+                if (wallShade != null) wallShade.selfShadows = true;
             }
 
             foreach (var torch in Resources.FindObjectsOfTypeAll<GameObject>().Where(obj => obj.name.Contains("Torch")))
             {
                 var _ = torch.AddComponent(typeof(LightFlickerEffect)) as LightFlickerEffect;
                 var torchLight = torch.AddComponent(typeof(Light2D)) as Light2D;
+                if (torchLight == null) continue;
                 torchLight.pointLightOuterRadius = 5;
                 torchLight.pointLightInnerRadius = 3;
                 torchLight.shadowsEnabled = true;
@@ -205,20 +213,18 @@ namespace DungeonCrawl.Core
                 torchLight.color = Color.yellow;
             }
 
-            foreach (var floor in Resources.FindObjectsOfTypeAll<GameObject>().Where(obj => obj.name == "HidenFloor"))
+            foreach (var floor in Resources.FindObjectsOfTypeAll<GameObject>().Where(obj => obj.name == "HiddenFloor"))
             {
                 floor.GetComponent<SpriteRenderer>().color = Color.green;
             }
 
-            foreach (var wall in Resources.FindObjectsOfTypeAll<GameObject>().Where(obj => obj.name.Contains("Hiden")))
+            foreach (var wall in Resources.FindObjectsOfTypeAll<GameObject>().Where(obj => obj.name.Contains("Hidden")))
             {
                 var wall2 = wall.GetComponent<SpriteRenderer>();
-                Color color = wall2.color;
+                var color = wall2.color;
                 color.a = 0;
                 wall2.color = color;
-
             }
-
         }
     }
 }

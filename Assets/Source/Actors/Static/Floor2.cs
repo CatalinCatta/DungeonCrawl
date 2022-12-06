@@ -1,4 +1,4 @@
-namespace DungeonCrawl.Actors.Static
+namespace Source.Actors.Static
 {
     public class Floor2 : Actor
     {
@@ -7,7 +7,6 @@ namespace DungeonCrawl.Actors.Static
 
         public override bool Detectable => false;
 
-        public override int Z => 1;
-
+        protected override int Z => 1;
     }
 }

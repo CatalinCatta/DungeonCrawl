@@ -1,34 +1,28 @@
-using UnityEngine;
-using System.Collections;
-using DungeonCrawl.Core;
-using DungeonCrawl.Actors.Static;
-using Assets.Source.Core;
-using System;
-
-namespace DungeonCrawl.Actors.Characters
+namespace Source.Actors.Characters
 {
     public class Grave : Character
     {
         public Ghost ghost;
 
-        public override bool OnCollision(Actor anotherActor)
+        protected override bool OnCollision(Actor anotherActor)
         {
             return false;
         }
 
         protected override void OnDeath()
         {
-            if (ghost != null && ghost.ActualHealth > 0) { ghost.ApplyDamage(Damage); }
+            if (ghost != null && ghost.ActualHealth > 0)
+            {
+                ghost.ApplyDamage(Damage);
+            }
         }
 
-        public override void Drop()
+        protected override void Drop()
         {
-
         }
 
-        public override void Hit(Actor actor)
+        protected override void Hit(Actor actor)
         {
-
         }
 
         public override void Starter()

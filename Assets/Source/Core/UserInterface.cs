@@ -1,24 +1,36 @@
 ﻿using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
-using static Assets.Source.Core.UserInterface;
+using UnityEngine.Serialization;
 
-namespace Assets.Source.Core
+namespace Source.Core
 {
     /// <summary>
     ///     Class for handling text on user interface (UI)
     /// </summary>
     public class UserInterface : MonoBehaviour
     {
-        public TextMeshProUGUI _playerStatsText;
-        public TextMeshProUGUI _bossStatsText;
-        public TextMeshProUGUI _messageBoxText;
-        public TextMeshProUGUI _hintBoxText;
+        [FormerlySerializedAs("_playerStatsText")]
+        public TextMeshProUGUI playerStatsText;
 
-        public GameObject _playerStatsObject;
-        public GameObject _bossStatsObject;
-        public GameObject _messageBoxObject;
-        public GameObject _hintBoxObject;
+        [FormerlySerializedAs("_bossStatsText")]
+        public TextMeshProUGUI bossStatsText;
+
+        [FormerlySerializedAs("_messageBoxText")]
+        public TextMeshProUGUI messageBoxText;
+
+        [FormerlySerializedAs("_hintBoxText")] public TextMeshProUGUI hintBoxText;
+
+        [FormerlySerializedAs("_playerStatsObject")]
+        public GameObject playerStatsObject;
+
+        [FormerlySerializedAs("_bossStatsObject")]
+        public GameObject bossStatsObject;
+
+        [FormerlySerializedAs("_messageBoxObject")]
+        public GameObject messageBoxObject;
+
+        [FormerlySerializedAs("_hintBoxObject")]
+        public GameObject hintBoxObject;
 
         public enum TextPosition : byte
         {
@@ -49,19 +61,19 @@ namespace Assets.Source.Core
             }
 
 
-            _playerStatsText = GameObject.Find("Status Text").GetComponent<TMPro.TextMeshProUGUI>();
-            _bossStatsText = GameObject.Find("Boss Status Text").GetComponent<TMPro.TextMeshProUGUI>();
-            _messageBoxText = GameObject.Find("Message Text").GetComponent<TMPro.TextMeshProUGUI>();
-            _hintBoxText = GameObject.Find("Hint Text").GetComponent<TMPro.TextMeshProUGUI>();
+            playerStatsText = GameObject.Find("Status Text").GetComponent<TextMeshProUGUI>();
+            bossStatsText = GameObject.Find("Boss Status Text").GetComponent<TextMeshProUGUI>();
+            messageBoxText = GameObject.Find("Message Text").GetComponent<TextMeshProUGUI>();
+            hintBoxText = GameObject.Find("Hint Text").GetComponent<TextMeshProUGUI>();
 
-            _playerStatsObject = GameObject.Find("Status Frame");
-            _bossStatsObject = GameObject.Find("Boss Status Frame");
-            _messageBoxObject = GameObject.Find("Message Frame");
-            _hintBoxObject = GameObject.Find("Hint Frame");
+            playerStatsObject = GameObject.Find("Status Frame");
+            bossStatsObject = GameObject.Find("Boss Status Frame");
+            messageBoxObject = GameObject.Find("Message Frame");
+            hintBoxObject = GameObject.Find("Hint Frame");
 
-            _bossStatsObject.SetActive(false);
-            _messageBoxObject.SetActive(false);
-            _hintBoxObject.SetActive(false);
+            bossStatsObject.SetActive(false);
+            messageBoxObject.SetActive(false);
+            hintBoxObject.SetActive(false);
 
             Singleton = this;
 
@@ -80,38 +92,41 @@ namespace Assets.Source.Core
                 case TextPosition.TopRight:
                     if (text == "")
                     {
-                        _hintBoxObject.SetActive(false);
+                        hintBoxObject.SetActive(false);
                     }
                     else
                     {
-                        _hintBoxObject.SetActive(true);
-                        _hintBoxText.text = text;
+                        hintBoxObject.SetActive(true);
+                        hintBoxText.text = text;
                     }
+
                     break;
 
                 case TextPosition.TopCenter:
                     if (text == "")
                     {
-                        _messageBoxObject.SetActive(false);
+                        messageBoxObject.SetActive(false);
                     }
                     else
                     {
-                        _messageBoxObject.SetActive(true);
-                        _messageBoxText.text = text;
+                        messageBoxObject.SetActive(true);
+                        messageBoxText.text = text;
                     }
+
                     break;
 
                 case TextPosition.MiddleCenter:
                     if (text == "")
                     {
-                        _bossStatsObject.SetActive(false);
+                        bossStatsObject.SetActive(false);
                     }
                     else
                     {
-                        _messageBoxObject.SetActive(false);
-                        _bossStatsObject.SetActive(true);
-                        _bossStatsText.text = text;
+                        messageBoxObject.SetActive(false);
+                        bossStatsObject.SetActive(true);
+                        bossStatsText.text = text;
                     }
+
                     break;
 
                 default:
@@ -119,6 +134,5 @@ namespace Assets.Source.Core
                     break;
             }
         }
-
     }
 }

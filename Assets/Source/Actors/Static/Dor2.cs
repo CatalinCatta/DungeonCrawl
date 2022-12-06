@@ -1,18 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class Door2 : MonoBehaviour
+namespace Source.Actors.Static
 {
-    // Start is called before the first frame update
-    void Start()
+    public class Dor2 : Actor
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public override int DefaultSpriteId => 782;
+        public override string DefaultName => "Dor2";
     }
 }

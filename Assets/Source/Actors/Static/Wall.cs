@@ -1,4 +1,4 @@
-﻿namespace DungeonCrawl.Actors.Static
+﻿namespace Source.Actors.Static
 {
     public class Wall : Actor
     {

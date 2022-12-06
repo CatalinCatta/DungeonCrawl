@@ -1,15 +1,12 @@
-using UnityEngine;
-using System.Collections;
-using DungeonCrawl.Core;
-using DungeonCrawl.Actors.Static;
-using Assets.Source.Core;
 using System;
+using System.Collections;
+using UnityEngine;
 
-namespace DungeonCrawl.Actors.Characters
+namespace Source.Actors.Characters
 {
     public class Zombie : Character
     {
-        public override bool OnCollision(Actor anotherActor)
+        protected override bool OnCollision(Actor anotherActor)
         {
             return false;
         }
@@ -19,7 +16,7 @@ namespace DungeonCrawl.Actors.Characters
             Debug.Log("Well, I was already dead anyway...");
         }
 
-        public override void Hit(Actor actor)
+        protected override void Hit(Actor actor)
         {
             if (actor is Player player)
             {
@@ -27,10 +24,15 @@ namespace DungeonCrawl.Actors.Characters
             }
         }
 
-        IEnumerator Start()
+        private IEnumerator Start()
         {
             while (true)
             {
+                if (ActualHealth <= 0)
+                {
+                    break;
+                }
+
                 yield return new WaitForSeconds(1f);
                 RandomPosition();
                 HitEnemy();
@@ -38,10 +40,10 @@ namespace DungeonCrawl.Actors.Characters
             }
         }
 
-        public void RandomPosition()
+        private void RandomPosition()
         {
-            Array values = Enum.GetValues(typeof(Direction));
-            System.Random random = new System.Random();
+            var values = Enum.GetValues(typeof(Direction));
+            var random = new System.Random();
             TryMove((Direction)values.GetValue(random.Next(values.Length)));
         }
 

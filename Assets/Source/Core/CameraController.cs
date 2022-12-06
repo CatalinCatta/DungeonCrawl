@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace DungeonCrawl.Core
+namespace Source.Core
 {
     /// <summary>
     ///     Class used for manipulating camera's position

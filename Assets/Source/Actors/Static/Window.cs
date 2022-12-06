@@ -1,4 +1,4 @@
-namespace DungeonCrawl.Actors.Static
+namespace Source.Actors.Static
 {
     public class Window : Actor
     {
@@ -6,4 +6,3 @@ namespace DungeonCrawl.Actors.Static
         public override string DefaultName => "Window";
     }
 }
-

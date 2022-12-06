@@ -1,212 +1,206 @@
-﻿using UnityEngine;
-using DungeonCrawl.Actors;
-using System;
+﻿using System;
+using Source.Actors;
+using Source.Actors.Characters;
+using Source.Core;
+using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
-using DungeonCrawl.Actors.Characters;
-using Assets.Source.Core;
-using DungeonCrawl.Actors.Static;   
 
-namespace DungeonCrawl.Core
+public class Inventory : MonoBehaviour
 {
-    public class Inventory : MonoBehaviour
+    private bool _onOff;
+    private readonly Items[] _inventoryList = new Items[12];
+
+    public void Add(Actor item)
     {
-        private bool onOff = false;
-        private Items[] inventoryList = new Items[12];
-
-        public void Add(Actor item)
+        for (var i = 0; i < 12; i++)
         {
-            for (int i = 0; i < 12; i++)
+            if (_inventoryList[i] == null || _inventoryList[i].SpriteId != item.DefaultSpriteId) continue;
+            _inventoryList[i].Count++;
+            var tempCount = GameObject.Find($"Counter_{i}");
+            if (tempCount != null)
             {
-                if (inventoryList[i] != null && inventoryList[i].SpriteId == item.DefaultSpriteId)
-                {
-                    inventoryList[i].Count++;
-                    var temp_count = GameObject.Find($"Counter_{i}");
-                    if (temp_count != null) { temp_count.GetComponent<Text>().text = inventoryList[i].Count.ToString(); }
-                    return;
-                }
-                
+                tempCount.GetComponent<Text>().text = _inventoryList[i].Count.ToString();
             }
-            
-            int index = Array.IndexOf(inventoryList, null);
-            var slot = GameObject.Find($"Slot_{index}");
-            var count = GameObject.Find($"Counter_{index}");
-            if (slot != null)
-            {
-                slot.GetComponent<Image>().sprite = ActorManager.Singleton.GetSprite(item.DefaultSpriteId);
-                count.GetComponent<Text>().text = "1";
-            }
-            inventoryList[index] = new Items(item.DefaultSpriteId, 1, item.DefaultName);
 
+            return;
         }
 
-        public void ShowInventory(GameObject display, GameObject viewer)
+        var index = Array.IndexOf(_inventoryList, null);
+        var slot = GameObject.Find($"Slot_{index}");
+        var count = GameObject.Find($"Counter_{index}");
+        if (slot != null)
         {
-            if (onOff)
+            slot.GetComponent<Image>().sprite = ActorManager.Singleton.GetSprite(item.DefaultSpriteId);
+            count.GetComponent<Text>().text = "1";
+        }
+
+        _inventoryList[index] = new Items(item.DefaultSpriteId, 1, item.DefaultName);
+    }
+
+    public void ShowInventory(GameObject display, GameObject viewer)
+    {
+        if (_onOff)
+        {
+            display.SetActive(false);
+            _onOff = false;
+            viewer.SetActive(true);
+        }
+        else
+        {
+            viewer.SetActive(false);
+            display.SetActive(true);
+            _onOff = true;
+            for (var i = 0; i < 12; i++)
             {
-                display.SetActive(false);
-                onOff = false;
-                viewer.SetActive(true);
+                var item = GameObject.Find($"Slot_{i}");
+                var count = GameObject.Find($"Counter_{i}");
+                if (_inventoryList[i] != null)
+                {
+                    if (_inventoryList[i].Name == "Sword")
+                    {
+                        UserInterface.Singleton.SetText(
+                            "To use an item u will ned to press the corresponding number(1.. 2.. 3..)",
+                            UserInterface.TextPosition.TopCenter);
+                    }
+
+                    if (_inventoryList[i].Name == "Key")
+                    {
+                        UserInterface.Singleton.SetText(
+                            "A key.. I wonder what is that for.. let's try hitting that dor with the face",
+                            UserInterface.TextPosition.TopCenter);
+                    }
+
+                    item.GetComponent<Image>().sprite = ActorManager.Singleton.GetSprite(_inventoryList[i].SpriteId);
+                    count.GetComponent<Text>().text = _inventoryList[i].Count.ToString();
+                }
+                else
+                {
+                    item.GetComponent<Image>().sprite = null;
+                    count.GetComponent<Text>().text = "";
+                }
+            }
+        }
+    }
+
+    public bool Remove(string itemName)
+    {
+        for (var i = 0; i < 12; i++)
+        {
+            if (_inventoryList[i] == null || _inventoryList[i].Name != itemName) continue;
+            var count = GameObject.Find($"Counter_{i}");
+            _inventoryList[i].Count--;
+
+            if (_inventoryList[i].Count == 0)
+            {
+                _inventoryList[i] = null;
+
+                var slot = GameObject.Find($"Slot_{i}");
+
+                if (slot == null) return true;
+                slot.GetComponent<Image>().sprite = null;
+                count.GetComponent<Text>().text = "";
             }
             else
             {
-                viewer.SetActive(false);
-                display.SetActive(true);
-                onOff = true;
-                for (int i = 0; i < 12; i++)
+                if (count != null)
                 {
-                    var item = GameObject.Find($"Slot_{i}");
-                    var count = GameObject.Find($"Counter_{i}");
-                    if (inventoryList[i] != null)
-                    {
-                        if (inventoryList[i].Name == "Sword")
-                        {
-                            UserInterface.Singleton.SetText("To use an item u will ned to press the corensponding number(1.. 2.. 3..)", UserInterface.TextPosition.TopCenter);
-                        }
-                        if (inventoryList[i].Name == "Key")
-                        {
-                            UserInterface.Singleton.SetText("A key.. I wonder what is that for.. let's try hiting that dor with the face", UserInterface.TextPosition.TopCenter);
-                        }
-                        item.GetComponent<Image>().sprite = ActorManager.Singleton.GetSprite(inventoryList[i].SpriteId);
-                        count.GetComponent<Text>().text = inventoryList[i].Count.ToString();
-                    }
-                    else
-                    {
-                        item.GetComponent<Image>().sprite = null;
-                        count.GetComponent<Text>().text = "";
-                    }
+                    count.GetComponent<Text>().text = _inventoryList[i].Count.ToString();
                 }
             }
+
+            return true;
         }
 
-        public bool Remove(string name)
+        return false;
+    }
+
+    public void SelectItem()
+    {
+        if (!_onOff) return;
+        KeyCode[] inv =
         {
-            for (int i = 0; i < 12; i++)
+            KeyCode.Alpha1,
+            KeyCode.Alpha2,
+            KeyCode.Alpha3,
+            KeyCode.Alpha4,
+            KeyCode.Alpha5,
+            KeyCode.Alpha6,
+            KeyCode.Alpha7,
+            KeyCode.Alpha8,
+            KeyCode.Alpha9,
+            KeyCode.Alpha0,
+            KeyCode.Minus,
+            KeyCode.Equals,
+        };
+        for (var i = 0; i < 12; i++)
+        {
+            if (!Input.GetKeyDown(inv[i])) continue;
+            // Move up
+            if (_inventoryList[i] != null)
             {
-                if (inventoryList[i] != null && inventoryList[i].Name == name)
-                {
-                    var count = GameObject.Find($"Counter_{i}");
-                    inventoryList[i].Count--;
-
-                    if (inventoryList[i].Count == 0)
-                    {
-                        inventoryList[i] = null;
-
-                        var slot = GameObject.Find($"Slot_{i}");
-
-                        if (slot != null) 
-                        { 
-                            slot.GetComponent<Image>().sprite = null;
-                            count.GetComponent<Text>().text = "";
-                        }
-                    }
-                    else
-                    {
-                        if (count != null) { count.GetComponent<Text>().text = inventoryList[i].Count.ToString(); }
-                    }
-                    return true;
-
-                }
+                Consume(_inventoryList[i]);
             }
-            return false;
-        }
-        
-        public void selectItem()
-        {
-            if (onOff)
-            {
-                KeyCode[] inv =
-                {
-                    KeyCode.Alpha1,
-                    KeyCode.Alpha2,
-                    KeyCode.Alpha3,
-                    KeyCode.Alpha4,
-                    KeyCode.Alpha5,
-                    KeyCode.Alpha6,
-                    KeyCode.Alpha7,
-                    KeyCode.Alpha8,
-                    KeyCode.Alpha9,
-                    KeyCode.Alpha0,
-                    KeyCode.Minus,
-                    KeyCode.Equals,
-                };
-                for (int i = 0; i < 12; i++)
-                {
 
-                    if (Input.GetKeyDown(inv[i]))
-                    {
-                        // Move up
-                        if (inventoryList[i] != null) { Consume(inventoryList[i]); }
-                        break;
-                    }
-                }
-            }
+            break;
         }
+    }
 
-        private void Consume(Items item)
+    private void Consume(Items item)
+    {
+        var itemName = item.Name;
+        var player = ActorManager.Singleton.GetActor<Player>();
+
+        switch (itemName)
         {
-            string name = item.Name;
-            Player player = ActorManager.Singleton.GetActor<Player>();
-            if (name == "Heal")
-            {
+            case "Heal":
                 UserInterface.Singleton.SetText("", UserInterface.TextPosition.TopCenter);
                 player.Heal(10);
                 player.ShowStats();
-                Remove(name);
-            }
-
-            if (name == "Sword")
-            {
+                Remove(itemName);
+                break;
+            case "Sword":
                 player.Damage = 2;
-                Remove(name);
-                GameObject.Find("Sword Holder").GetComponent<Image>().sprite = ActorManager.Singleton.GetSprite(item.SpriteId);
+                Remove(itemName);
+                GameObject.Find("Sword Holder").GetComponent<Image>().sprite =
+                    ActorManager.Singleton.GetSprite(item.SpriteId);
                 GameObject.Find("Sword Holder").GetComponent<Image>().color = new Color32(255, 255, 255, 255);
                 player.ShowStats();
-            }
-
-            if (name == "Meat")
-            {
+                break;
+            case "Meat":
                 player.Heal(player.MaxHealth);
                 player.ShowStats();
-                Remove(name);
-            }
-
-            if (name == "Dog")
-            {
+                Remove(itemName);
+                break;
+            case "Dog":
                 player.ShowStats();
-                Remove(name);
-                GameObject.Find("Companion Holder").GetComponent<Image>().sprite = ActorManager.Singleton.GetSprite(item.SpriteId);
+                Remove(itemName);
+                GameObject.Find("Companion Holder").GetComponent<Image>().sprite =
+                    ActorManager.Singleton.GetSprite(item.SpriteId);
                 GameObject.Find("Companion Holder").GetComponent<Image>().color = new Color32(255, 255, 255, 255);
                 player.companion = ActorManager.Singleton.Spawn<DogCompanion>(player.Position);
-            }
-
-            if (name == "Map")
-            {
-                Remove(name);
-                player.Map = true;
-            }
-            
-
-            if (name == "Armor")
-            {
-                player.ActualArmor = 50;
-                player.MaxArmor = 50;
-                Remove(name);
-                GameObject.Find("Armor Holder").GetComponent<Image>().sprite = ActorManager.Singleton.GetSprite(item.SpriteId);
+                break;
+            case "Map":
+                Remove(itemName);
+                player.map = true;
+                break;
+            case "Armor":
+                player.actualArmor = 50;
+                player.maxArmor = 50;
+                Remove(itemName);
+                GameObject.Find("Armor Holder").GetComponent<Image>().sprite =
+                    ActorManager.Singleton.GetSprite(item.SpriteId);
                 GameObject.Find("Armor Holder").GetComponent<Image>().color = new Color32(255, 255, 255, 255);
                 player.ShowStats();
                 player.SetSprite(29);
-            }
-
-            if (name == "Ring1")
-            {
-                player.Crit = 20;
-                Remove(name);
-                GameObject.Find("Ring Holder").GetComponent<Image>().sprite = ActorManager.Singleton.GetSprite(item.SpriteId);
+                break;
+            case "Ring1":
+                player.Crt = 20;
+                Remove(itemName);
+                GameObject.Find("Ring Holder").GetComponent<Image>().sprite =
+                    ActorManager.Singleton.GetSprite(item.SpriteId);
                 GameObject.Find("Ring Holder").GetComponent<Image>().color = new Color32(255, 255, 255, 255);
                 player.ShowStats();
-            }
-
+                break;
         }
     }
 }

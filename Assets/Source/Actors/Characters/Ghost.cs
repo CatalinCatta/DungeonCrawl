@@ -1,18 +1,17 @@
-using UnityEngine;
-using System.Collections;
-using DungeonCrawl.Core;
-using DungeonCrawl.Actors.Static;
-using Assets.Source.Core;
 using System;
+using System.Collections;
+using Source.Core;
+using UnityEngine;
+using UnityEngine.Serialization;
 
-namespace DungeonCrawl.Actors.Characters
+namespace Source.Actors.Characters
 {
     public class Ghost : Character
     {
-        public int Curse = 0;
+        [FormerlySerializedAs("Curse")] public int curse;
         public (int x, int y) GravePosition;
 
-        public override bool OnCollision(Actor anotherActor)
+        protected override bool OnCollision(Actor anotherActor)
         {
             return true;
         }
@@ -22,39 +21,42 @@ namespace DungeonCrawl.Actors.Characters
             Debug.Log("Well, I was already dead anyway...");
         }
 
-        public override void Hit(Actor actor)
+        protected override void Hit(Actor actor)
         {
-            if (actor is Player player)
-            {
-                Curse++;
-                player.ApplyDamage(Damage);
-            }
+            if (!(actor is Player player)) return;
+            curse++;
+            player.ApplyDamage(Damage);
+            Console.WriteLine();
         }
 
-        IEnumerator Start()
+        private IEnumerator Start()
         {
             while (true)
             {
-                yield return new WaitForSeconds(0.3f);
-                RandomPosition();
-                yield return new WaitForSeconds(0.3f);
-                RandomPosition();
-                yield return new WaitForSeconds(0.3f);
-                RandomPosition();
-                if (Curse > 0)
+                if (ActualHealth <= 0)
                 {
-                    ActorManager.Singleton.GetActor<Player>().ApplyDamage(Curse, "Curse");
+                    break;
+                }
+
+                yield return new WaitForSeconds(0.3f);
+                RandomPosition();
+                yield return new WaitForSeconds(0.3f);
+                RandomPosition();
+                yield return new WaitForSeconds(0.3f);
+                RandomPosition();
+                if (curse > 0)
+                {
+                    ActorManager.Singleton.GetActor<Player>().ApplyDamage(curse, "Curse");
                 }
             }
         }
 
-        public void RandomPosition()
+        private void RandomPosition()
         {
-            Array values = Enum.GetValues(typeof(Direction));
-            System.Random random = new System.Random();
+            var values = Enum.GetValues(typeof(Direction));
+            var random = new System.Random();
             var direction = (Direction)values.GetValue(random.Next(values.Length));
             TryMove(direction);
-            
         }
 
         public override void Starter()
@@ -64,19 +66,17 @@ namespace DungeonCrawl.Actors.Characters
             Damage = 3;
         }
 
-        public override void TryMove(Direction direction)
+        protected override void TryMove(Direction direction)
         {
             var vector = direction.ToVector();
             (int x, int y) targetPosition = (Position.x + vector.x, Position.y + vector.y);
 
             var actorAtTargetPosition = ActorManager.Singleton.GetActorAt(targetPosition);
 
-            if (targetPosition.x <= GravePosition.x + 6 && targetPosition.x >= GravePosition.x - 6 &&
-                targetPosition.y <= GravePosition.y + 6 && targetPosition.y >= GravePosition.y - 6)
-            {
-                Position = targetPosition;
-                Hit(actorAtTargetPosition);
-            }
+            if (targetPosition.x > GravePosition.x + 6 || targetPosition.x < GravePosition.x - 6 ||
+                targetPosition.y > GravePosition.y + 6 || targetPosition.y < GravePosition.y - 6) return;
+            Position = targetPosition;
+            Hit(actorAtTargetPosition);
         }
 
         public override int DefaultSpriteId => 314;
