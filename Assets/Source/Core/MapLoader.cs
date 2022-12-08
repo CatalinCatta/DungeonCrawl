@@ -18,7 +18,8 @@ namespace Source.Core
         ///     Constructs map from txt file and spawns actors at appropriate positions
         /// </summary>
         /// <param name="id"></param>
-        public static void LoadMap(int id)
+        /// <param name="loaded"></param>
+        public static void LoadMap(int id, string loaded = null)
         {
             var lines = Regex.Split(Resources.Load<TextAsset>($"map_{id}").text, "\r\n|\r|\n");
 
@@ -36,7 +37,7 @@ namespace Source.Core
                 for (var x = 0; x < width; x++)
                 {
                     var character = line[x];
-                    SpawnActor(character, (x, -y));
+                    SpawnActor(character, (x, -y), loaded);
 
                     if (character == 'P')
                     {
@@ -51,7 +52,7 @@ namespace Source.Core
             SetUp();
         }
 
-        private static void SpawnActor(char c, (int x, int y) position)
+        private static void SpawnActor(char c, (int x, int y) position, string loaded)
         {
             switch (c)
             {
@@ -63,14 +64,26 @@ namespace Source.Core
                     break;
                 case 'K':
                     ActorManager.Singleton.Spawn<Floor>(position);
-                    ActorManager.Singleton.Spawn<Key>(position);
+                    if (loaded == null)
+                    {
+                        ActorManager.Singleton.Spawn<ItemKey>(position);
+                    }
+
                     break;
                 case 'P':
-                    ActorManager.Singleton.Spawn<Player>(position);
+                    if (loaded == null)
+                    {
+                        ActorManager.Singleton.Spawn<Player>(position);
+                    }
+
                     ActorManager.Singleton.Spawn<Floor>(position);
                     break;
                 case 'S':
-                    ActorManager.Singleton.Spawn<Skeleton>(position);
+                    if (loaded == null)
+                    {
+                        ActorManager.Singleton.Spawn<EnemySkeleton>(position);
+                    }
+
                     ActorManager.Singleton.Spawn<Floor>(position);
                     break;
                 case '}':
@@ -78,28 +91,47 @@ namespace Source.Core
                     ActorManager.Singleton.Spawn<Floor>(position);
                     break;
                 case 'G':
-                    ActorManager.Singleton.Spawn<Grave>(position);
-                    ActorManager.Singleton.Spawn<Ghost>(position);
-                    ActorManager.Singleton.GetActorAt<Grave>(position).ghost =
-                        ActorManager.Singleton.GetActorAt<Ghost>(position);
-                    ActorManager.Singleton.GetActorAt<Ghost>(position).GravePosition = position;
+                    if (loaded == null)
+                    {
+                        var grave = ActorManager.Singleton.Spawn<EnemyGrave>(position);
+                        var ghost = ActorManager.Singleton.Spawn<EnemyGhost>(position);
+                        grave.enemyGhost = ghost;
+                        ghost.GravePosition = position;
+                    }
+
                     ActorManager.Singleton.Spawn<Floor>(position);
                     break;
                 case 'Z':
-                    ActorManager.Singleton.Spawn<Zombie>(position);
+                    if (loaded == null)
+                    {
+                        ActorManager.Singleton.Spawn<EnemyZombie>(position);
+                    }
+
                     ActorManager.Singleton.Spawn<Floor>(position);
                     break;
                 case 'H':
+                    if (loaded == null)
+                    {
+                        ActorManager.Singleton.Spawn<ItemHeal>(position);
+                    }
+
                     ActorManager.Singleton.Spawn<Floor>(position);
-                    ActorManager.Singleton.Spawn<Heal>(position);
                     break;
                 case 'D':
+                    if (loaded == null)
+                    {
+                        ActorManager.Singleton.Spawn<ItemDor>(position);
+                    }
+
                     ActorManager.Singleton.Spawn<Floor>(position);
-                    ActorManager.Singleton.Spawn<Dor>(position);
                     break;
                 case '^':
+                    if (loaded == null)
+                    {
+                        ActorManager.Singleton.Spawn<ItemSword>(position);
+                    }
+
                     ActorManager.Singleton.Spawn<Floor>(position);
-                    ActorManager.Singleton.Spawn<Sword>(position);
                     break;
                 case '+':
                     ActorManager.Singleton.Spawn<HiddenFloor>(position);
@@ -147,16 +179,28 @@ namespace Source.Core
                     ActorManager.Singleton.Spawn<Floor2>(position);
                     break;
                 case 'C':
+                    if (loaded == null)
+                    {
+                        ActorManager.Singleton.Spawn<ItemDog>(position);
+                    }
+
                     ActorManager.Singleton.Spawn<Floor2>(position);
-                    ActorManager.Singleton.Spawn<Dog>(position);
                     break;
                 case 'B':
+                    if (loaded == null)
+                    {
+                        ActorManager.Singleton.Spawn<ItemMeat>(position);
+                    }
+
                     ActorManager.Singleton.Spawn<Floor2>(position);
-                    ActorManager.Singleton.Spawn<Meat>(position);
                     break;
                 case 'M':
+                    if (loaded == null)
+                    {
+                        ActorManager.Singleton.Spawn<ItemMap>(position);
+                    }
+
                     ActorManager.Singleton.Spawn<Floor2>(position);
-                    ActorManager.Singleton.Spawn<Map>(position);
                     break;
                 case 'L':
                     ActorManager.Singleton.Spawn<Wall2>(position);
@@ -165,8 +209,12 @@ namespace Source.Core
                     ActorManager.Singleton.Spawn<Dor2>(position);
                     break;
                 case 'r':
+                    if (loaded == null)
+                    {
+                        ActorManager.Singleton.Spawn<ItemRing1>(position);
+                    }
+
                     ActorManager.Singleton.Spawn<Floor>(position);
-                    ActorManager.Singleton.Spawn<Ring1>(position);
                     break;
                 case 'T':
                     ActorManager.Singleton.Spawn<Floor>(position);
@@ -187,11 +235,15 @@ namespace Source.Core
 
         private static void SetUp()
         {
-            var playerLight = GameObject.Find("Player").AddComponent(typeof(Light2D)) as Light2D;
-            if (playerLight != null)
+            try
             {
+                var playerLight = GameObject.Find("Player").AddComponent(typeof(Light2D)) as Light2D;
                 playerLight.pointLightOuterRadius = 5;
                 playerLight.shadowsEnabled = true;
+            }
+            catch (NullReferenceException)
+            {
+                Debug.Log("Player not found or lights already on");
             }
 
             foreach (var wall in Resources.FindObjectsOfTypeAll<GameObject>().Where(obj => obj.name.Contains("Wall")))
