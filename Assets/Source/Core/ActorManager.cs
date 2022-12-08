@@ -52,13 +52,34 @@ namespace Source.Core
         /// <returns></returns>
         public T GetActorAt<T>((int x, int y) position) where T : Actor
         {
-            return _allActors.FirstOrDefault(actor => actor.Detectable && actor is T && actor.Position == position) as T;
+            return _allActors.FirstOrDefault(actor =>
+                actor.Detectable && actor is T && actor.Position == position) as T;
         }
 
 
         public T GetActor<T>() where T : Actor
         {
             return _allActors.FirstOrDefault(actor => actor.Detectable && actor is T) as T;
+        }
+
+        public IEnumerable<Actor> GetAllActors() => _allActors;
+
+        public IEnumerable<T> GetAllActors<T>()
+        {
+            //var aa = _allActors.Select(actor => actor.Detectable && actor is T).ToList();
+            var bb = _allActors.Where(actor => actor.Detectable && actor is T).ToList();
+
+            var a = new List<T>();
+
+            foreach (var b in bb)
+            {
+                if (b is T t)
+                {
+                    a.Add(t);
+                }
+            }
+
+            return a;
         }
 
         /// <summary>
@@ -77,6 +98,9 @@ namespace Source.Core
         public void DestroyAllActors()
         {
             var actors = _allActors.ToArray();
+            UserInterface.Singleton.ShowInventoryDisplay();
+            UserInterface.Singleton.inventor.Clear();
+            UserInterface.Singleton.ShowInventoryDisplay(false);
 
             foreach (var actor in actors)
                 DestroyActor(actor);
@@ -118,7 +142,7 @@ namespace Source.Core
             go.AddComponent<SpriteRenderer>();
 
             var component = go.AddComponent<T>();
-            Debug.Log(component);
+
             go.name = actorName ?? component.DefaultName;
             component.Position = (x, y);
 
@@ -127,6 +151,7 @@ namespace Source.Core
                 var audioSource = go.AddComponent<AudioSource>();
                 audioSource.clip = Resources.Load($"Audio/{component.DefaultName}-hit") as AudioClip;
             }
+
             _allActors.Add(component);
 
             return component;

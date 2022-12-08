@@ -76,7 +76,7 @@ namespace Source.Actors
 
                     if (targetPosition == (22, -33) && !player.boss1Killed)
                     {
-                        ActorManager.Singleton.Spawn<Boss1>((22, -36));
+                        ActorManager.Singleton.Spawn<EnemyBoss1>((22, -36));
                     }
                     // No obstacle found, just move
                 }
@@ -105,7 +105,7 @@ namespace Source.Actors
                 {
                     switch (actorAtTargetPosition)
                     {
-                        case Dor dor when player.inventory.Remove("Key"):
+                        case ItemDor dor when UserInterface.Singleton.inventor.Remove("InventoryItemKey"):
                             ActorManager.Singleton.DestroyActor(dor);
                             UserInterface.Singleton.SetText("Over the game u will find hp potions, use them wisely!",
                                 UserInterface.TextPosition.TopCenter);
