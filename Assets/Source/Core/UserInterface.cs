@@ -1,6 +1,7 @@
-﻿using TMPro;
+﻿using System.Collections;
+using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 namespace Source.Core
 {
@@ -9,28 +10,18 @@ namespace Source.Core
     /// </summary>
     public class UserInterface : MonoBehaviour
     {
-        [FormerlySerializedAs("_playerStatsText")]
         public TextMeshProUGUI playerStatsText;
-
-        [FormerlySerializedAs("_bossStatsText")]
         public TextMeshProUGUI bossStatsText;
-
-        [FormerlySerializedAs("_messageBoxText")]
         public TextMeshProUGUI messageBoxText;
-
-        [FormerlySerializedAs("_hintBoxText")] public TextMeshProUGUI hintBoxText;
-
-        [FormerlySerializedAs("_playerStatsObject")]
+        public TextMeshProUGUI hintBoxText;
         public GameObject playerStatsObject;
-
-        [FormerlySerializedAs("_bossStatsObject")]
         public GameObject bossStatsObject;
-
-        [FormerlySerializedAs("_messageBoxObject")]
         public GameObject messageBoxObject;
-
-        [FormerlySerializedAs("_hintBoxObject")]
         public GameObject hintBoxObject;
+        public GameObject inventoryDisplay;
+        public Inventory inventor;
+        public GameObject viewer;
+        public GameObject saveLoad;
 
         public enum TextPosition : byte
         {
@@ -52,6 +43,11 @@ namespace Source.Core
 
         private TextMeshProUGUI[] _textComponents;
 
+        public void ShowInventoryDisplay(bool show = true)
+        {
+            inventoryDisplay.SetActive(show);
+        }
+
         private void Awake()
         {
             if (Singleton != null)
@@ -60,12 +56,20 @@ namespace Source.Core
                 return;
             }
 
+            inventoryDisplay = GameObject.Find("Inventory");
+            inventor = inventoryDisplay.GetComponent<Inventory>();
+            viewer = GameObject.Find("Viewer");
+            if (inventoryDisplay != null)
+            {
+                inventoryDisplay.SetActive(false);
+            }
 
             playerStatsText = GameObject.Find("Status Text").GetComponent<TextMeshProUGUI>();
             bossStatsText = GameObject.Find("Boss Status Text").GetComponent<TextMeshProUGUI>();
             messageBoxText = GameObject.Find("Message Text").GetComponent<TextMeshProUGUI>();
             hintBoxText = GameObject.Find("Hint Text").GetComponent<TextMeshProUGUI>();
 
+            saveLoad = GameObject.Find("Save/Load Frame");
             playerStatsObject = GameObject.Find("Status Frame");
             bossStatsObject = GameObject.Find("Boss Status Frame");
             messageBoxObject = GameObject.Find("Message Frame");
@@ -74,10 +78,68 @@ namespace Source.Core
             bossStatsObject.SetActive(false);
             messageBoxObject.SetActive(false);
             hintBoxObject.SetActive(false);
+            saveLoad.SetActive(false);
 
             Singleton = this;
 
             _textComponents = GetComponentsInChildren<TextMeshProUGUI>();
+        }
+
+        public void Update()
+        {
+            OnUpdate();
+        }
+
+        private IEnumerator SaveAnimation(string iconName)
+        {
+            saveLoad.SetActive(true);
+            var opusIconName = iconName == "Save" ? "Load" : "Save";
+            var opusIcon = GameObject.Find($"{opusIconName} Sign");
+            opusIcon.SetActive(false);
+            var icon = GameObject.Find($"{iconName} Sign");
+            GameObject.Find("Save/Load Text").GetComponent<TextMeshProUGUI>().text =
+                iconName == "Save" ? "Game saved" : "Game loaded";
+            var initialSpriteName = icon.GetComponent<Image>().sprite.name.Replace("(Clone)", "");
+            var timer = 0;
+            while (true)
+            {
+                yield return new WaitForSeconds(0.5f);
+                timer++;
+                if (timer == 5)
+                {
+                    icon.GetComponent<Image>().sprite =
+                        ActorManager.Singleton.GetSprite(
+                            int.Parse(initialSpriteName.Substring(initialSpriteName.Length - 3)));
+                }
+
+                if (timer == 10)
+                {
+                    break;
+                }
+
+                var spriteName = icon.GetComponent<Image>().sprite.name.Replace("(Clone)", "");
+                Debug.Log(spriteName.Substring(spriteName.Length - 3));
+                icon.GetComponent<Image>().sprite =
+                    ActorManager.Singleton.GetSprite(int.Parse(spriteName.Substring(spriteName.Length - 3)) + 1);
+            }
+
+            icon.GetComponent<Image>().sprite =
+                ActorManager.Singleton.GetSprite(int.Parse(initialSpriteName.Substring(initialSpriteName.Length - 3)));
+            opusIcon.SetActive(true);
+            saveLoad.SetActive(false);
+        }
+
+        private void OnUpdate()
+        {
+            if (Input.GetKeyDown(KeyCode.F9))
+            {
+                StartCoroutine(SaveAnimation("Load"));
+                SavingObject.Load();
+            }
+
+            if (!Input.GetKeyDown(KeyCode.F5)) return;
+            StartCoroutine(SaveAnimation("Save"));
+            SavingObject.Save(Singleton.inventor);
         }
 
         /// <summary>
@@ -129,6 +191,12 @@ namespace Source.Core
 
                     break;
 
+                case TextPosition.TopLeft:
+                case TextPosition.MiddleLeft:
+                case TextPosition.MiddleRight:
+                case TextPosition.BottomLeft:
+                case TextPosition.BottomCenter:
+                case TextPosition.BottomRight:
                 default:
                     _textComponents[(int)textPosition].text = text;
                     break;
