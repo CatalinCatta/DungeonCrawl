@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Source.Actors.Characters
 {
-    public class Boss1 : Character
+    public class EnemyBoss1 : Character
     {
         public (int x, int y) GravePosition;
 
@@ -32,13 +32,13 @@ namespace Source.Actors.Characters
                 }
 
                 yield return timer;
-                if (actualArmor == 0)
+                if (ActualArmor == 0)
                 {
                     ChangePosition();
                 }
 
                 yield return timer;
-                if (actualArmor == 0)
+                if (ActualArmor == 0)
                 {
                     ChangePosition();
                 }
@@ -48,7 +48,7 @@ namespace Source.Actors.Characters
                 }
 
                 yield return timer;
-                if (actualArmor != 0) continue;
+                if (ActualArmor != 0) continue;
                 ChangePosition();
                 HitEnemy();
             }
@@ -80,16 +80,16 @@ namespace Source.Actors.Characters
                     switch (counter)
                     {
                         case 0:
-                            ActorManager.Singleton.Spawn<Armor>(position);
+                            ActorManager.Singleton.Spawn<ItemArmor>(position);
                             break;
                         case 1:
-                            ActorManager.Singleton.Spawn<Meat>(position);
+                            ActorManager.Singleton.Spawn<ItemMeat>(position);
                             break;
                     }
 
                     if (counter == 2)
                     {
-                        ActorManager.Singleton.Spawn<Meat>(position);
+                        ActorManager.Singleton.Spawn<ItemMeat>(position);
                         break;
                     }
                 }
@@ -99,17 +99,17 @@ namespace Source.Actors.Characters
                     switch (randomEnemy)
                     {
                         case 0:
-                            ActorManager.Singleton.Spawn<Skeleton>(position);
+                            ActorManager.Singleton.Spawn<EnemySkeleton>(position);
                             break;
                         case 1:
-                            ActorManager.Singleton.Spawn<Zombie>(position);
+                            ActorManager.Singleton.Spawn<EnemyZombie>(position);
                             break;
                         case 2:
-                            ActorManager.Singleton.Spawn<Grave>(position);
-                            ActorManager.Singleton.Spawn<Ghost>(position);
-                            ActorManager.Singleton.GetActorAt<Grave>(position).ghost =
-                                ActorManager.Singleton.GetActorAt<Ghost>(position);
-                            ActorManager.Singleton.GetActorAt<Ghost>(position).GravePosition = position;
+                            ActorManager.Singleton.Spawn<EnemyGrave>(position);
+                            ActorManager.Singleton.Spawn<EnemyGhost>(position);
+                            ActorManager.Singleton.GetActorAt<EnemyGrave>(position).enemyGhost =
+                                ActorManager.Singleton.GetActorAt<EnemyGhost>(position);
+                            ActorManager.Singleton.GetActorAt<EnemyGhost>(position).GravePosition = position;
                             break;
                     }
 
@@ -133,7 +133,7 @@ namespace Source.Actors.Characters
 
         public void ShowStats()
         {
-            UserInterface.Singleton.SetText($"{ActualHealth}/{MaxHealth}\n{actualArmor}/{maxArmor}",
+            UserInterface.Singleton.SetText($"{ActualHealth}/{MaxHealth}\n{ActualArmor}/{MaxArmor}",
                 UserInterface.TextPosition.MiddleCenter);
         }
 
@@ -143,11 +143,11 @@ namespace Source.Actors.Characters
             MaxHealth = 100;
             ActualHealth = 100;
             Damage = 20;
-            actualArmor = 50;
-            maxArmor = 50;
+            ActualArmor = 50;
+            MaxArmor = 50;
 
-            ActorManager.Singleton.Spawn<Gate>((13, -36));
-            ActorManager.Singleton.Spawn<Gate>((22, -32));
+            ActorManager.Singleton.Spawn<ItemGate>((13, -36));
+            ActorManager.Singleton.Spawn<ItemGate>((22, -32));
 
             ShowStats();
         }
@@ -155,12 +155,15 @@ namespace Source.Actors.Characters
         public void TrueForm()
         {
             SetSprite(169);
+            spriteId = 169;
             SummonAcolytes("items");
-            actualArmor = 0;
+            ActualArmor = 0;
             ShowStats();
         }
 
-        public override int DefaultSpriteId => 170;
-        public override string DefaultName => "Boss1";
+        public override int DefaultSpriteId => spriteId;
+        public override string DefaultName => "EnemyBoss1";
+
+        public int spriteId = 170;
     }
 }

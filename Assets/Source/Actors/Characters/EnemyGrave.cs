@@ -1,8 +1,8 @@
 namespace Source.Actors.Characters
 {
-    public class Grave : Character
+    public class EnemyGrave : Character
     {
-        public Ghost ghost;
+        public EnemyGhost enemyGhost;
 
         protected override bool OnCollision(Actor anotherActor)
         {
@@ -11,10 +11,9 @@ namespace Source.Actors.Characters
 
         protected override void OnDeath()
         {
-            if (ghost != null && ghost.ActualHealth > 0)
-            {
-                ghost.ApplyDamage(Damage);
-            }
+            if (enemyGhost == null || enemyGhost.ActualHealth <= 0) return;
+            enemyGhost.curse = 0;
+            enemyGhost.ApplyDamage(Damage);
         }
 
         protected override void Drop()
@@ -33,6 +32,6 @@ namespace Source.Actors.Characters
         }
 
         public override int DefaultSpriteId => 672;
-        public override string DefaultName => "Grave";
+        public override string DefaultName => "EnemyGrave";
     }
 }

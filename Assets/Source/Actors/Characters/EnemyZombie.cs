@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Source.Actors.Characters
 {
-    public class Zombie : Character
+    public class EnemyZombie : Character
     {
         protected override bool OnCollision(Actor anotherActor)
         {
@@ -55,6 +55,6 @@ namespace Source.Actors.Characters
         }
 
         public override int DefaultSpriteId => 120;
-        public override string DefaultName => "Zombie";
+        public override string DefaultName => "EnemyZombie";
     }
 }

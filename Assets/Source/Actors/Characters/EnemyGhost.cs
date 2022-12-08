@@ -2,13 +2,12 @@ using System;
 using System.Collections;
 using Source.Core;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Source.Actors.Characters
 {
-    public class Ghost : Character
+    public class EnemyGhost : Character
     {
-        [FormerlySerializedAs("Curse")] public int curse;
+        public int curse;
         public (int x, int y) GravePosition;
 
         protected override bool OnCollision(Actor anotherActor)
@@ -80,6 +79,6 @@ namespace Source.Actors.Characters
         }
 
         public override int DefaultSpriteId => 314;
-        public override string DefaultName => "Ghost";
+        public override string DefaultName => "EnemyGhost";
     }
 }

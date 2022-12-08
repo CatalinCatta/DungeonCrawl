@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Source.Actors.Characters
 {
-    public class Skeleton : Character
+    public class EnemySkeleton : Character
     {
         protected override bool OnCollision(Actor anotherActor)
         {
@@ -54,7 +54,7 @@ namespace Source.Actors.Characters
         {
             if (Position == (6, -8))
             {
-                ActorManager.Singleton.Spawn<Key>(Position);
+                ActorManager.Singleton.Spawn<ItemKey>(Position);
             }
             else
             {
@@ -62,17 +62,17 @@ namespace Source.Actors.Characters
                 var dropRate = rand.Next(100);
                 if (dropRate < 20)
                 {
-                    ActorManager.Singleton.Spawn<Heal>(Position);
+                    ActorManager.Singleton.Spawn<ItemHeal>(Position);
                 }
 
                 if (dropRate == 20)
                 {
-                    ActorManager.Singleton.Spawn<Meat>(Position);
+                    ActorManager.Singleton.Spawn<ItemMeat>(Position);
                 }
             }
         }
 
         public override int DefaultSpriteId => 316;
-        public override string DefaultName => "Skeleton";
+        public override string DefaultName => "EnemySkeleton";
     }
 }
