@@ -9,24 +9,78 @@ namespace Source.Core
     public class Inventory : MonoBehaviour
     {
         private bool _onOff;
-        private readonly Items[] _inventoryList = new Items[12];
+        public Items[] InventoryList = new Items[12];
+        public readonly Items[] EquippedItems = new Items[7];
+
+        private readonly int[] _defaultSprites = new[]
+        {
+            32,
+            323,
+            330,
+            79,
+            231,
+            407,
+            38
+        };
+
+        public void Clear()
+        {
+            InventoryList = new Items[12];
+            for (var i = 0; i < 12; i++)
+            {
+                var item = GameObject.Find($"Slot_{i}");
+                var count = GameObject.Find($"Counter_{i}");
+                if (InventoryList[i] == null) continue;
+                item.GetComponent<Image>().sprite = null;
+                count.GetComponent<Text>().text = "";
+            }
+
+            for (var i = 0; i < _defaultSprites.Length; i++)
+            {
+                var count = GameObject.Find($"Item Frame_{i}").transform.GetChild(0).GetChild(0).gameObject;
+                count.GetComponent<Image>().sprite = ActorManager.Singleton.GetSprite(_defaultSprites[i]);
+                count.GetComponent<Image>().color = new Color32(128, 128, 128, 150);
+            }
+        }
+
+        public void LoadItem(Items item)
+        {
+            if (item.Name.Contains("Equipped"))
+            {
+                UserInterface.Singleton.ShowInventoryDisplay();
+                Consume(new Items(item.SpriteId, item.Count, item.Name.Replace("Equipped", "")));
+                UserInterface.Singleton.ShowInventoryDisplay(false);
+                return;
+            }
+
+            var index = Array.IndexOf(InventoryList, null);
+            var slot = GameObject.Find($"Slot_{index}");
+            var count = GameObject.Find($"Counter_{index}");
+            if (slot != null)
+            {
+                slot.GetComponent<Image>().sprite = ActorManager.Singleton.GetSprite(item.SpriteId);
+                count.GetComponent<Text>().text = item.Count.ToString();
+            }
+
+            InventoryList[index] = item;
+        }
 
         public void Add(Actor item)
         {
             for (var i = 0; i < 12; i++)
             {
-                if (_inventoryList[i] == null || _inventoryList[i].SpriteId != item.DefaultSpriteId) continue;
-                _inventoryList[i].Count++;
+                if (InventoryList[i] == null || InventoryList[i].SpriteId != item.DefaultSpriteId) continue;
+                InventoryList[i].Count++;
                 var tempCount = GameObject.Find($"Counter_{i}");
                 if (tempCount != null)
                 {
-                    tempCount.GetComponent<Text>().text = _inventoryList[i].Count.ToString();
+                    tempCount.GetComponent<Text>().text = InventoryList[i].Count.ToString();
                 }
 
                 return;
             }
 
-            var index = Array.IndexOf(_inventoryList, null);
+            var index = Array.IndexOf(InventoryList, null);
             var slot = GameObject.Find($"Slot_{index}");
             var count = GameObject.Find($"Counter_{index}");
             if (slot != null)
@@ -35,7 +89,7 @@ namespace Source.Core
                 count.GetComponent<Text>().text = "1";
             }
 
-            _inventoryList[index] = new Items(item.DefaultSpriteId, 1, item.DefaultName);
+            InventoryList[index] = new Items(item.DefaultSpriteId, 1, $"Inventory{item.DefaultName}");
         }
 
         public void ShowInventory(GameObject display, GameObject viewer)
@@ -55,24 +109,24 @@ namespace Source.Core
                 {
                     var item = GameObject.Find($"Slot_{i}");
                     var count = GameObject.Find($"Counter_{i}");
-                    if (_inventoryList[i] != null)
+                    if (InventoryList[i] != null)
                     {
-                        if (_inventoryList[i].Name == "Sword")
+                        if (InventoryList[i].Name == "InventoryItemSword")
                         {
                             UserInterface.Singleton.SetText(
                                 "To use an item u will ned to press the corresponding number(1.. 2.. 3..)",
                                 UserInterface.TextPosition.TopCenter);
                         }
 
-                        if (_inventoryList[i].Name == "Key")
+                        if (InventoryList[i].Name == "InventoryItemKey")
                         {
                             UserInterface.Singleton.SetText(
                                 "A key.. I wonder what is that for.. let's try hitting that dor with the face",
                                 UserInterface.TextPosition.TopCenter);
                         }
 
-                        item.GetComponent<Image>().sprite = ActorManager.Singleton.GetSprite(_inventoryList[i].SpriteId);
-                        count.GetComponent<Text>().text = _inventoryList[i].Count.ToString();
+                        item.GetComponent<Image>().sprite = ActorManager.Singleton.GetSprite(InventoryList[i].SpriteId);
+                        count.GetComponent<Text>().text = InventoryList[i].Count.ToString();
                     }
                     else
                     {
@@ -87,13 +141,13 @@ namespace Source.Core
         {
             for (var i = 0; i < 12; i++)
             {
-                if (_inventoryList[i] == null || _inventoryList[i].Name != itemName) continue;
+                if (InventoryList[i] == null || InventoryList[i].Name != itemName) continue;
                 var count = GameObject.Find($"Counter_{i}");
-                _inventoryList[i].Count--;
+                InventoryList[i].Count--;
 
-                if (_inventoryList[i].Count == 0)
+                if (InventoryList[i].Count == 0)
                 {
-                    _inventoryList[i] = null;
+                    InventoryList[i] = null;
 
                     var slot = GameObject.Find($"Slot_{i}");
 
@@ -105,7 +159,7 @@ namespace Source.Core
                 {
                     if (count != null)
                     {
-                        count.GetComponent<Text>().text = _inventoryList[i].Count.ToString();
+                        count.GetComponent<Text>().text = InventoryList[i].Count.ToString();
                     }
                 }
 
@@ -137,9 +191,9 @@ namespace Source.Core
             {
                 if (!Input.GetKeyDown(inv[i])) continue;
                 // Move up
-                if (_inventoryList[i] != null)
+                if (InventoryList[i] != null)
                 {
-                    Consume(_inventoryList[i]);
+                    Consume(InventoryList[i]);
                 }
 
                 break;
@@ -153,55 +207,72 @@ namespace Source.Core
 
             switch (itemName)
             {
-                case "Heal":
+                case "InventoryItemHeal":
                     UserInterface.Singleton.SetText("", UserInterface.TextPosition.TopCenter);
                     player.Heal(10);
+                    CleanCure();
                     player.ShowStats();
                     Remove(itemName);
                     break;
-                case "Sword":
+                case "InventoryItemSword":
                     player.Damage = 2;
-                    Remove(itemName);
                     GameObject.Find("Sword Holder").GetComponent<Image>().sprite =
                         ActorManager.Singleton.GetSprite(item.SpriteId);
                     GameObject.Find("Sword Holder").GetComponent<Image>().color = new Color32(255, 255, 255, 255);
                     player.ShowStats();
+                    EquippedItems[1] = item;
+                    Remove(itemName);
                     break;
-                case "Meat":
+                case "InventoryItemMeat":
                     player.Heal(player.MaxHealth);
+                    CleanCure();
                     player.ShowStats();
                     Remove(itemName);
                     break;
-                case "Dog":
+                case "InventoryItemDog":
                     player.ShowStats();
-                    Remove(itemName);
                     GameObject.Find("Companion Holder").GetComponent<Image>().sprite =
                         ActorManager.Singleton.GetSprite(item.SpriteId);
                     GameObject.Find("Companion Holder").GetComponent<Image>().color = new Color32(255, 255, 255, 255);
                     player.companion = ActorManager.Singleton.Spawn<DogCompanion>(player.Position);
-                    break;
-                case "Map":
+                    EquippedItems[6] = item;
+                    player.ShowStats();
                     Remove(itemName);
+                    break;
+                case "InventoryItemMap":
                     player.map = true;
-                    break;
-                case "Armor":
-                    player.actualArmor = 50;
-                    player.maxArmor = 50;
                     Remove(itemName);
+                    break;
+                case "InventoryItemArmor":
+                    player.ActualArmor = 50;
+                    player.MaxArmor = 50;
                     GameObject.Find("Armor Holder").GetComponent<Image>().sprite =
                         ActorManager.Singleton.GetSprite(item.SpriteId);
                     GameObject.Find("Armor Holder").GetComponent<Image>().color = new Color32(255, 255, 255, 255);
                     player.ShowStats();
                     player.SetSprite(29);
-                    break;
-                case "Ring1":
-                    player.Crt = 20;
+                    player.spriteId = 29;
+                    EquippedItems[4] = item;
                     Remove(itemName);
+                    break;
+                case "InventoryItemRing1":
+                    player.Crt = 20;
                     GameObject.Find("Ring Holder").GetComponent<Image>().sprite =
                         ActorManager.Singleton.GetSprite(item.SpriteId);
                     GameObject.Find("Ring Holder").GetComponent<Image>().color = new Color32(255, 255, 255, 255);
                     player.ShowStats();
+                    EquippedItems[3] = item;
+                    Remove(itemName);
                     break;
+            }
+        }
+
+        private static void CleanCure()
+        {
+            var ghosts = ActorManager.Singleton.GetAllActors<EnemyGhost>();
+            foreach (var ghost in ghosts)
+            {
+                ghost.curse = 0;
             }
         }
     }
