@@ -2,43 +2,27 @@
 using Source.Actors.Static;
 using Source.Core;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Source.Actors.Characters
 {
     public class Player : Character
     {
-        [FormerlySerializedAs("Dog")] public bool dog;
-        private static GameObject _inventoryDisplay;
-        public Inventory inventory;
-        [FormerlySerializedAs("ItemOnGround")] public Actor itemOnGround;
-        [FormerlySerializedAs("SecretShowed")] public bool secretShowed;
-
-        [FormerlySerializedAs("InsideSecretArea")]
+        public bool dog;
+        public Actor itemOnGround;
+        public bool secretShowed;
         public bool insideSecretArea;
-
         public Actor companion;
-        [FormerlySerializedAs("Map")] public bool map;
-        [FormerlySerializedAs("Boss1Killed")] public bool boss1Killed;
-        [FormerlySerializedAs("DodgeChance")] public int dodgeChance;
-        private GameObject _viewer;
+        public bool map;
+        public bool boss1Killed;
+        public int dodgeChance;
 
         public override void Starter()
         {
-            _inventoryDisplay = GameObject.Find("Inventory");
-            _viewer = GameObject.Find("Viewer");
-            inventory = _inventoryDisplay.GetComponent<Inventory>();
-
-            if (_inventoryDisplay != null)
-            {
-                _inventoryDisplay.SetActive(false);
-            }
-
             MaxHealth = 100;
             ActualHealth = 100;
             Damage = 1;
-            actualArmor = 0;
-            maxArmor = 0;
+            ActualArmor = 0;
+            MaxArmor = 0;
 
             ShowStats();
             UserInterface.Singleton.SetText("Look, there is a sword, let's pick it up!",
@@ -48,12 +32,12 @@ namespace Source.Actors.Characters
         public void ShowStats()
         {
             UserInterface.Singleton.playerStatsText.text =
-                $"{ActualHealth}/{MaxHealth} \n{(companion is DogCompanion ? (Damage * 2) : Damage)} \n{actualArmor}/{maxArmor} \n{dodgeChance}% \n{Crt}%";
+                $"{ActualHealth}/{MaxHealth} \n{(companion is DogCompanion ? (Damage * 2) : Damage)} \n{ActualArmor}/{MaxArmor} \n{dodgeChance}% \n{Crt}%";
         }
 
         protected override void OnUpdate(float deltaTime)
         {
-            inventory.SelectItem();
+            UserInterface.Singleton.inventor.SelectItem();
 
             if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
             {
@@ -89,7 +73,8 @@ namespace Source.Actors.Characters
             if (Input.GetKeyDown(KeyCode.I))
             {
                 // inventory
-                inventory.ShowInventory(_inventoryDisplay, _viewer);
+                UserInterface.Singleton.inventor.ShowInventory(UserInterface.Singleton.inventoryDisplay,
+                    UserInterface.Singleton.viewer);
             }
 
             if (Input.GetKeyDown(KeyCode.Space))
@@ -98,23 +83,11 @@ namespace Source.Actors.Characters
                 HitEnemy();
             }
 
-            if (Input.GetKeyDown(KeyCode.Return))
+            if (!Input.GetKeyDown(KeyCode.Return)) return;
+            var start = GameObject.Find("Start");
+            if (start != null)
             {
-                var start = GameObject.Find("Start");
-                if (start != null)
-                {
-                    start.SetActive(false);
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.F5))
-            {
-                // save
-            }
-
-            if (Input.GetKeyDown(KeyCode.F9))
-            {
-                // load
+                start.SetActive(false);
             }
         }
 
@@ -123,13 +96,13 @@ namespace Source.Actors.Characters
             UserInterface.Singleton.SetText("", UserInterface.TextPosition.TopRight);
 
             if (itemOnGround == null || !itemOnGround.OnGround) return;
-            if (itemOnGround is Sword)
+            if (itemOnGround is ItemSword)
             {
                 UserInterface.Singleton.SetText("Nice! Now equip it.. Hint: Press I!",
                     UserInterface.TextPosition.TopCenter);
             }
 
-            inventory.Add(itemOnGround);
+            UserInterface.Singleton.inventor.Add(itemOnGround);
             ActorManager.Singleton.DestroyActor(itemOnGround);
         }
 
@@ -155,8 +128,16 @@ namespace Source.Actors.Characters
             ShowStats();
         }
 
-        public override int DefaultSpriteId => 24;
-        public override string DefaultName => "Player";
+        public override int DefaultSpriteId => spriteId;
+        public override string DefaultName => _name;
+
+        private string _name = "Player";
+        public int spriteId = 24;
+
+        public void SetName(string newName)
+        {
+            _name = newName;
+        }
 
         protected override void Drop()
         {
@@ -178,9 +159,9 @@ namespace Source.Actors.Characters
             {
                 var wall2 = wall.GetComponent<SpriteRenderer>();
 
-                if ((wall2 == null || wall.name == this.name) || (this.companion != null &&
-                                                                  (this.companion == null ||
-                                                                   wall.name == this.companion.name))) continue;
+                if ((wall2 == null || wall.name == this._name) || (this.companion != null &&
+                                                                   (this.companion == null ||
+                                                                    wall.name == this.companion.name))) continue;
                 var color = wall2.color;
                 color.a = secretShowed ? (float)0.5 : 1;
                 wall2.color = color;
