@@ -3,22 +3,22 @@ using System.Collections.Generic;
 using Source.Actors.Static;
 using Source.Core;
 using UnityEngine;
-using UnityEngine.Serialization;
+using Object = UnityEngine.Object;
 
 namespace Source.Actors.Characters
 {
     public abstract class Character : Actor
     {
         public int MaxHealth { get; protected set; }
-        public int ActualHealth { get; protected set; }
+        public int ActualHealth { get; set; }
         public int Damage { get; set; }
-        [FormerlySerializedAs("MaxArmor")] public int maxArmor;
-        [FormerlySerializedAs("ActualArmor")] public int actualArmor;
-        [field: FormerlySerializedAs("Crt")] public int Crt { get; set; }
+        public int MaxArmor { get; set; }
+        public int ActualArmor { get; set; }
+        public int Crt { get; set; }
 
-        public void ApplyDamage(int damage, string curse = null, string criticalDmg = null)
+        public void ApplyDamage(int hit, string curse = null, string criticalDmg = null)
         {
-            var hitDmg = this.HitAnimation(damage, criticalDmg, curse);
+            var hitDmg = this.HitAnimation(hit, criticalDmg, curse);
             //if (!(this is Player))
 
             var actor = this.gameObject;
@@ -32,18 +32,18 @@ namespace Source.Actors.Characters
 
             // }
 
-            if (this.actualArmor > 0 && curse == null)
+            if (this.ActualArmor > 0 && curse == null)
             {
-                this.actualArmor -= damage / 2;
+                this.ActualArmor -= hit / 2;
 
-                if (this is Boss1 b1 && actualArmor <= 0)
+                if (this is EnemyBoss1 b1 && ActualArmor <= 0)
                 {
                     b1.TrueForm();
                 }
             }
             else
             {
-                this.ActualHealth -= damage;
+                this.ActualHealth -= hit;
             }
 
             if (this is Player player)
@@ -51,7 +51,7 @@ namespace Source.Actors.Characters
                 player.ShowStats();
             }
 
-            if (this is Boss1 boss1)
+            if (this is EnemyBoss1 boss1)
             {
                 boss1.ShowStats();
             }
@@ -105,9 +105,9 @@ namespace Source.Actors.Characters
                 }
             };
 
-            var damage = newObj2.AddComponent<TextMesh>();
-            damage.text = dmg.ToString();
-            damage.fontSize = 8;
+            var hit = newObj2.AddComponent<TextMesh>();
+            hit.text = dmg.ToString();
+            hit.fontSize = 8;
 
             return newObj1;
         }
@@ -169,12 +169,12 @@ namespace Source.Actors.Characters
             var dropRate = rand.Next(100);
             if (dropRate < 20)
             {
-                ActorManager.Singleton.Spawn<Heal>(Position);
+                ActorManager.Singleton.Spawn<ItemHeal>(Position);
             }
 
             if (dropRate == 20)
             {
-                ActorManager.Singleton.Spawn<Meat>(Position);
+                ActorManager.Singleton.Spawn<ItemMeat>(Position);
             }
         }
     }
