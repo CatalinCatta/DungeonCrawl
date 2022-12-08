@@ -1,9 +1,9 @@
 namespace Source.Actors.Static
 {
-    public class Ring1 : Actor
+    public class ItemMap : Actor
     {
-        public override int DefaultSpriteId => 330;
-        public override string DefaultName => "Ring1";
+        public override int DefaultSpriteId => 751;
+        public override string DefaultName => "ItemMap";
 
         public override bool OnGround => true;
 

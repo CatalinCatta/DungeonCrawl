@@ -1,9 +1,9 @@
 namespace Source.Actors.Static
 {
-    public class Dog : Actor
+    public class ItemDog : Actor
     {
         public override int DefaultSpriteId => 366;
-        public override string DefaultName => "Dog";
+        public override string DefaultName => "ItemDog";
 
         public override bool OnGround => true;
 

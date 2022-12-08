@@ -1,9 +1,10 @@
 namespace Source.Actors.Static
 {
-    public class Key : Actor
+    public class ItemHeal : Actor
     {
-        public override int DefaultSpriteId => 559;
-        public override string DefaultName => "Key";
+        public override int DefaultSpriteId => 568;
+        public override string DefaultName => "ItemHeal";
+
         public override bool OnGround => true;
 
         protected override bool OnCollision(Actor anotherActor)

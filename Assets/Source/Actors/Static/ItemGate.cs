@@ -1,8 +1,8 @@
 namespace Source.Actors.Static
 {
-    public class Gate : Actor
+    public class ItemGate : Actor
     {
         public override int DefaultSpriteId => 148;
-        public override string DefaultName => "Gate";
+        public override string DefaultName => "ItemGate";
     }
 }

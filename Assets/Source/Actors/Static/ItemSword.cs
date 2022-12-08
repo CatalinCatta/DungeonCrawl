@@ -1,9 +1,9 @@
 namespace Source.Actors.Static
 {
-    public class Meat : Actor
+    public class ItemSword : Actor
     {
-        public override int DefaultSpriteId => 800;
-        public override string DefaultName => "Meat";
+        public override int DefaultSpriteId => 371;
+        public override string DefaultName => "ItemSword";
 
         public override bool OnGround => true;
 
@@ -11,7 +11,5 @@ namespace Source.Actors.Static
         {
             return true;
         }
-
-        protected override int Z => -1;
     }
 }
