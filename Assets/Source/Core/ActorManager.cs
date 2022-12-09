@@ -149,7 +149,7 @@ namespace Source.Core
             if (typeof(T).IsSubclassOf(typeof(Character)))
             {
                 var audioSource = go.AddComponent<AudioSource>();
-                audioSource.clip = Resources.Load($"Audio/{component.DefaultName}-hit") as AudioClip;
+                audioSource.clip = Resources.Load($"Audio/{component.DefaultName.Replace("Enemy", "")}-hit") as AudioClip;
             }
 
             _allActors.Add(component);

@@ -18,23 +18,23 @@ namespace Source.Actors.Characters
 
         public void ApplyDamage(int hit, string curse = null, string criticalDmg = null)
         {
-            var hitDmg = this.HitAnimation(hit, criticalDmg, curse);
+            var hitDmg = HitAnimation(hit, criticalDmg, curse);
             //if (!(this is Player))
 
-            var actor = this.gameObject;
+            var actor = gameObject;
 
             var audioSource = actor.GetComponent(typeof(AudioSource)) as AudioSource;
 
-            if (audioSource != null && !audioSource.isPlaying)
+            if (audioSource != null)
             {
                 audioSource.Play();
             }
 
             // }
 
-            if (this.ActualArmor > 0 && curse == null)
+            if (ActualArmor > 0 && curse == null)
             {
-                this.ActualArmor -= hit / 2;
+                ActualArmor -= hit / 2;
 
                 if (this is EnemyBoss1 b1 && ActualArmor <= 0)
                 {
@@ -43,7 +43,7 @@ namespace Source.Actors.Characters
             }
             else
             {
-                this.ActualHealth -= hit;
+                ActualHealth -= hit;
             }
 
             if (this is Player player)
@@ -64,10 +64,10 @@ namespace Source.Actors.Characters
 
                 if (!(this is Player) && audioSource != null)
                 {
-                    audioSource.clip = Resources.Load($"Audio/{this.name}-die") as AudioClip;
+                    audioSource.clip = Resources.Load($"Audio/{DefaultName.Replace("Enemy", "")}-die") as AudioClip;
                     audioSource.Play();
 
-                    StartCoroutine(this.DeathSound());
+                    StartCoroutine(DeathSound());
                 }
                 else
                 {
