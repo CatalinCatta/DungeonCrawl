@@ -1,90 +1,28 @@
-# Dungeon Crawl (sprint 2)
+# Dungeon Crawl
 
 ## Story
+- Dungeon Crawl is a thrilling 2D single-player adventure RPG game that takes you on an epic journey through a mysterious and dangerous world of dungeons, monsters, and treasure. In this game, you play as a brave adventurer who seeks to uncover the secrets hidden within the depths of the dungeons.
 
-Last week you created a pretty good [Roguelike](https://en.wikipedia.org/wiki/Roguelike) game.
-It already has some features, but the players have no opportunity to save their games.
-It can be annoying, especially when you have to leave the game suddenly.
+- As you explore each level of the game, you will encounter a wide variety of challenging enemies and obstacles. From goblins and trolls to deadly dragons and other mythical beasts, each foe presents its own unique challenge that requires different strategies and tactics to overcome. You'll need to use your wits, weapons, and skills to fight your way through the hordes of monsters and emerge victorious.
 
-The gamer community is begging you for saving functionality and some other new and interesting ideas, such as:
+- In addition to combat, Dungeon Crawl also features intricate puzzles, hidden treasures, and secrets that are scattered throughout the game. You'll need to be clever and resourceful to solve these puzzles, uncover the hidden treasures, and unlock the secrets of the dungeon.
 
-- game sharing between players
-- maps of different sizes
-- player-tracking camera movement
+- The game features intuitive controls that allow you to move around the levels, fight enemies, and interact with objects easily. The RPG-style leveling system lets you upgrade your character as you progress, giving you more powerful weapons, spells, and abilities to take on the increasingly difficult challenges that lie ahead.
 
-Management is handing out a **prioritized list** of new user stories that must be
-appended to the unfinished stories from last week in your product backlog.
-Try to estimate these new stories as well, and, based on the estimations,
-pick the stories your team can finish in this sprint.
+- Dungeon Crawl's 2D graphics are stunningly detailed and atmospheric, bringing the game's world to life with vibrant colors and dynamic lighting. The game also features an immersive soundtrack that perfectly complements the game's dark and foreboding atmosphere.
 
-> Using database for saving game state feature is a business critical item which overrides every other priority now!
+- Overall, Dungeon Crawl is a must-play game for any fan of the RPG genre. With its thrilling gameplay, intricate puzzles, and immersive world, it's sure to keep you entertained for hours on end.
 
-Continue this entertaining project and make our players happier!
+### Used technologies:
+1. [C#](https://learn.microsoft.com/en-us/dotnet/csharp/)
+2. [Unity](https://docs.unity.com/)
 
-## What are you going to learn?
+### Project Features:
+- Game can save and load in any moment in format [Json](https://www.json.org/json-en.html)
+- Secret areas
+- Find and equip items for bonus stats
 
-- Serialize objects.
-- Communicate with databases.
-- Write unit tests for your classes.
-- Understand the **Data Access Object** design pattern.
-
-## Tasks
-
-1. Create a new sprint from the existing backlog. Last week, you had a long list of stories, and there are a few new stories this week.
-    - The new items are added to the backlog.
-    - The team has created a new sprint plan, based on the unified backlog.
-    - The mandatory "Saving game" backlog item is in Sprint 2 and planned in detail.
-
-2. As you work in a new repository, but need the code from the previous sprint, add the `dungeon-crawl-2` repository as a new remote to the repository of the previous sprint, then pull (merge) and push your changes into it.
-    - There is a merge commit in the project repository that contains code from the previous sprint.
-
-3. Allow the user to save the current state of the game in a database. Extend the given schema if needed.
-    - The application uses SQL Server database with the schema in `schema_ddl.sql`.
-    - The application respects the `MSSQL_USER_NAME`, `MSSQL_PASSWORD`, and `MSSQL_DB_NAME` environment variables.
-    - An Entity Relationship diagram (connections between classes, 1-1, 1-many, and so on) is created in a digitalized format.
-    - When the user presses `F5`, the game saves the current state (current map, player position, and inventory content) in the database, overwriting the old game state (if there is one in the database). In the corner of the screen, a UI text displays "Game saved." for 5 seconds.
-    - Already discovered maps are also saved in the DB.
-    - When the user presses `F9`, the game loads the previously saved state (map, position, and inventory). After loading, in the corner of the screen, a UI text displays "Game loaded." for 5 seconds. 
-
-4. Allow the user to export (serialize) their game state into a text file, and load (deserialize) the game from the exported file.
-    - Pressing `F10` triggers the export mechanism.
-    - The export process creates the exported file in the `exported_saves` subfolder in the main directory of the game. The file name is generated with the following pattern: `<game-name>_<save's-date-and-hour>.json`.
-    - The file stores every necessary game state information in a JSON format.
-    - Pressing `F11` imports the last exported game (it selects the file based on the date and hour in the file name). If the chosen file is not in the proper format, the game displays an "IMPORT ERROR!" message on UI, in the corner of the screen.
-
-5. The customer looks for quality assurance and wants to see that your code is covered by unit tests. It is important to also cover negative scenarios, not only positive test cases.
-    - Every unit test method is well-arranged and follows the `arrange`-`act`-`assert` structure.
-    - Unit test classes and methods adhere to the following naming conventions consistently.
-- classes: `<The name of the tested class>Test`
-- methods: `<the name of the tested method>_<expected input / tested state>_<expected behavior>`
-    - Every test class has at least one negative test case (or more, if it is plausible).
-    - Code coverage of self-created business logic classes is above 90%.
-
-## General requirements
-
-None
-
-## Hints
-
-- Break down the backlog items into smaller tasks so that you can work in parallel.
-- The given DB schema is only an example. You probably need to alter it,
-  according to the requirements. For example, it doesn't contain any information
-  on the inventory, or on maps discovered by the player.
-- Write as many unit tests as possible to cover your business logic.
-- Set up a test for getting `null` as an argument for methods that take a reference type parameter. These are called negative test cases.
-- Unity C# projects don't support NuGets and direct project references. In order to be able to use the SQL Server
-  classes, take the `System.Data.dll` file from the start repo and put it in the `Assets` subfolder of your Unity project. Upon refreshing the C# solution, you should be able to work with SQL Server databases just fine.
-- Read the value of an environment variable' using `System.GetEnvironmentVariable("VAR_NAME");`.
-- View and edit environment variables in [Visual Studio](https://www.tutorialsteacher.com/core/aspnet-core-environment-variable) and in [Rider](https://blog.jetbrains.com/dotnet/2017/08/23/rundebug-configurations-rider/).
-
-
-## Background materials
-
-- <i class="far fa-exclamation"></i> [Software testing](project/curriculum/materials/pages/general/software-testing.md)
-- <i class="far fa-book-open"></i> [Positive or negative](https://stackoverflow.com/questions/8162423)
-- <i class="far fa-exclamation"></i> [How to design classes](project/curriculum/materials/pages/csharp/how-to-design-classes.md)
-- <i class="far fa-book-open"></i> [Unity Documentaton](https://docs.unity3d.com/Manual/index.html)
-- <i class="far fa-exclamation"></i> [SQL in Visual Studio and CRUD operations](https://alexcodetuts.com/2019/04/26/how-to-connect-sql-server-database-using-c-and-perform-crud-operation-part-1/)
-- <i class="far fa-exclamation"></i> [Obtaining data through SQL DataReader](https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/retrieving-data-using-a-datareader)
-- <i class="far fa-exclamation"></i> [JSON.NET](https://www.newtonsoft.com/json)
-- [1-Bit Pack by Kenney](https://kenney.nl/assets/bit-pack)
+### How to Run the Project?
+1. Clone the [Repo](https://github.com/CatalinCatta/DungeonCrawl.git).
+2. Open the project in Unity Editor version 2021.1.24f1
+3. Have Fun!
