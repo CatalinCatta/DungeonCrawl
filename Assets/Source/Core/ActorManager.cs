@@ -139,7 +139,8 @@ namespace Source.Core
         private T Spawn<T>(int x, int y, string actorName = null) where T : Actor
         {
             var go = new GameObject();
-            go.AddComponent<SpriteRenderer>();
+    
+            var test = go.AddComponent<SpriteRenderer>();
 
             var component = go.AddComponent<T>();
 
@@ -153,7 +154,11 @@ namespace Source.Core
             }
 
             _allActors.Add(component);
-
+            // var newMat = Resources.Load("../../../Packages/Universal RP/Shaders/2D/Sprite-Lit-Default", typeof(Material)) as Material;
+            // Debug.Log(newMat);
+            // Debug.Log(newMat);
+            // test.material = newMat;
+            //
             return component;
         }
     }
